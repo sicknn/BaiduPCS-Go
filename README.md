@@ -1,7 +1,3 @@
-Here is the English translation of the README.md document:
-
-***
-
 # BaiduPCS-Go Baidu Netdisk Client (Enhanced Version)
 
 
