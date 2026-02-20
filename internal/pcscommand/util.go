@@ -12,9 +12,9 @@ const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 var (
 	// ErrShellPatternMultiRes 多条通配符匹配结果
-	ErrShellPatternMultiRes = errors.New("多条通配符匹配结果")
+	ErrShellPatternMultiRes = errors.New("multiple wildcard matches")
 	// ErrShellPatternNoHit 未匹配到路径
-	ErrShellPatternNoHit = errors.New("未匹配到路径, 请检测通配符")
+	ErrShellPatternNoHit = errors.New("no path matched, please check wildcard pattern")
 )
 
 // ListTask 队列状态 (基类)

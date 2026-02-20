@@ -33,12 +33,12 @@ func (pl *PCSLiner) DoWriteHistory() (err error) {
 
 	pl.History.historyFile, err = os.Create(pl.History.historyFilePath)
 	if err != nil {
-		return fmt.Errorf("写入历史错误, %s", err)
+		return fmt.Errorf("failed to write command history, %s", err)
 	}
 
 	_, err = pl.State.WriteHistory(pl.History.historyFile)
 	if err != nil {
-		return fmt.Errorf("写入历史错误: %s", err)
+		return fmt.Errorf("failed to write command history: %s", err)
 	}
 
 	return nil

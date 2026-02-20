@@ -54,31 +54,31 @@ const (
 func GetStatusText(sc StatusCode) string {
 	switch sc {
 	case StatusCodeInit:
-		return "初始化"
+		return "Initialized"
 	case StatusCodeSucceeded:
-		return "成功"
+		return "Succeeded"
 	case StatusCodePending:
-		return "等待响应"
+		return "Waiting for response"
 	case StatusCodeDownloading:
-		return "下载中"
+		return "Downloading"
 	case StatusCodeWaitToWrite:
-		return "等待写入数据"
+		return "Waiting to write data"
 	case StatusCodeInternalError:
-		return "内部错误"
+		return "Internal error"
 	case StatusCodeTooManyConnections:
-		return "连接数太多"
+		return "Too many connections"
 	case StatusCodeNetError:
-		return "网络错误"
+		return "Network error"
 	case StatusCodeFailed:
-		return "下载失败"
+		return "Failed"
 	case StatusCodePaused:
-		return "已暂停"
+		return "Paused"
 	case StatusCodeReseted:
-		return "已重设连接"
+		return "Connection reset"
 	case StatusCodeCanceled:
-		return "已取消"
+		return "Canceled"
 	default:
-		return "未知状态码"
+		return "Unknown status code"
 	}
 }
 

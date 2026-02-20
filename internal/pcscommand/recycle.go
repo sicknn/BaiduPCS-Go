@@ -25,7 +25,7 @@ func RunRecycleList(page int) {
 	}
 
 	tb := pcstable.NewTable(os.Stdout)
-	tb.SetHeader([]string{"#", "fs_id", "文件大小", "创建日期", "修改日期", "md5(截图请打码)", "剩余时间", "路径"})
+	tb.SetHeader([]string{"#", "fs_id", "Size", "Created", "Modified", "md5 (mask before sharing screenshots)", "Time left", "Path"})
 	tb.SetColumnAlignment([]int{tablewriter.ALIGN_DEFAULT, tablewriter.ALIGN_RIGHT, tablewriter.ALIGN_RIGHT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_DEFAULT, tablewriter.ALIGN_LEFT})
 	for k, file := range fdl {
 		if file.Isdir == 1 {
@@ -48,7 +48,7 @@ func RunRecycleRestore(fidStrList ...string) {
 	if err != nil {
 		fmt.Println(err)
 		if len(ex) > 0 {
-			fmt.Printf("\n以下的 fs_id 还原成功, 数量: %d\n", len(ex))
+			fmt.Printf("\nThe following fs_id values were restored successfully, count: %d\n", len(ex))
 			for k := range ex {
 				fmt.Println(ex[k].FsID)
 			}
@@ -56,7 +56,7 @@ func RunRecycleRestore(fidStrList ...string) {
 		return
 	}
 
-	fmt.Printf("还原成功, 数量: %d\n", len(ex))
+	fmt.Printf("Restore succeeded, count: %d\n", len(ex))
 }
 
 // RunRecycleDelete 执行删除回收站文件或目录
@@ -71,7 +71,7 @@ func RunRecycleDelete(fidStrList ...string) {
 		return
 	}
 
-	fmt.Printf("删除成功\n")
+	fmt.Printf("Deleted successfully\n")
 }
 
 // RunRecycleClear 清空回收站
@@ -82,5 +82,5 @@ func RunRecycleClear() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("清空回收站成功, 数量: %d\n", sussNum)
+	fmt.Printf("Recycle bin cleared, count: %d\n", sussNum)
 }

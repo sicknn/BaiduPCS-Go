@@ -40,11 +40,11 @@ var (
 	// ErrUploadSavePathFound 未找到保存路径
 	ErrUploadSavePathFound = errors.New("unknown response data, file saved path not found")
 	// ErrUploadSeqNotMatch 服务器返回的上传队列不匹配
-	ErrUploadSeqNotMatch = errors.New("服务器返回的上传队列不匹配")
+	ErrUploadSeqNotMatch = errors.New("upload sequence returned by server does not match")
 	// ErrUploadMD5Unknown 服务器无匹配文件/秒传未生效
-	ErrUploadMD5Unknown = errors.New("服务器无匹配文件/秒传未生效")
+	ErrUploadMD5Unknown = errors.New("server has no matching file / rapid upload did not take effect")
 	// ErrUploadFileExists 文件或目录已存在
-	ErrUploadFileExists = errors.New("文件已存在")
+	ErrUploadFileExists = errors.New("file already exists")
 
 	// FakeBlockListMD5 虚假秒传时的BlockList
 	fakeBlockListMD5 = []string{"5910a591dd8fc18c32a8f3df4fdc1761", "a5fc157d78e6ad1c7e114b056c92821e"}

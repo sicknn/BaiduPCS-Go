@@ -13,7 +13,7 @@ var (
 	signInfoRE         = regexp.MustCompile(`"sign1":"(.*?)"[\s\S]*"sign3":"(.*?)","timestamp":(\d*?),`)
 	ErrCookieInvalid   = errors.New("cookie is invalid")
 	ErrUnknownLocation = errors.New("unknown location")
-	ErrMatchPanHome    = errors.New("网盘首页数据匹配出错")
+	ErrMatchPanHome    = errors.New("failed to match netdisk home page data")
 )
 
 func (ph *PanHome) getSignInfo() error {

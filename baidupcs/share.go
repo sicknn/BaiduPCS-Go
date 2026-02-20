@@ -65,7 +65,7 @@ type (
 
 var (
 	// ErrShareLinkNotFound 未找到分享链接
-	ErrShareLinkNotFound = errors.New("未找到分享链接")
+	ErrShareLinkNotFound = errors.New("share link not found")
 )
 
 // ShareSet 分享文件

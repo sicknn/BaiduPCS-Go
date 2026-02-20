@@ -36,13 +36,13 @@ var (
 	ErrGetRapidUploadInfoLengthNotFound   = errors.New("Content-Length not found")
 	ErrGetRapidUploadInfoMD5NotFound      = errors.New("Content-MD5 not found")
 	ErrGetRapidUploadInfoCrc32NotFound    = errors.New("x-bs-meta-crc32 not found")
-	ErrGetRapidUploadInfoFilenameNotEqual = errors.New("文件名不匹配")
-	ErrGetRapidUploadInfoLengthNotEqual   = errors.New("Content-Length 不匹配")
-	ErrGetRapidUploadInfoMD5NotEqual      = errors.New("Content-MD5 不匹配")
-	ErrGetRapidUploadInfoCrc32NotEqual    = errors.New("x-bs-meta-crc32 不匹配")
-	ErrGetRapidUploadInfoSliceMD5NotEqual = errors.New("slice-md5 不匹配")
+	ErrGetRapidUploadInfoFilenameNotEqual = errors.New("filename mismatch")
+	ErrGetRapidUploadInfoLengthNotEqual   = errors.New("Content-Length mismatch")
+	ErrGetRapidUploadInfoMD5NotEqual      = errors.New("Content-MD5 mismatch")
+	ErrGetRapidUploadInfoCrc32NotEqual    = errors.New("x-bs-meta-crc32 mismatch")
+	ErrGetRapidUploadInfoSliceMD5NotEqual = errors.New("slice-md5 mismatch")
 
-	ErrFileTooLarge = errors.New("文件大于20GB, 无法秒传")
+	ErrFileTooLarge = errors.New("file is larger than 20GB, rapid upload is unavailable")
 )
 
 func (pcs *BaiduPCS) getLocateDownloadLink(pcspath string) (link string, pcsError pcserror.Error) {

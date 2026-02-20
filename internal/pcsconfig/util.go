@@ -28,7 +28,7 @@ func stripPerSecond(sizeStr string) string {
 
 func showMaxRate(size int64) string {
 	if size <= 0 {
-		return "不限制"
+		return "unlimited"
 	}
 	return converter.ConvertFileSize(size, 2) + "/s"
 }

@@ -44,7 +44,7 @@ func runCpMvOp(op string, paths ...string) {
 		case 1:
 			to = tos[0]
 		default:
-			fmt.Printf("目标目录有 %d 条匹配结果, 请检查通配符\n", len(tos))
+			fmt.Printf("Target directory has %d matches, please check your wildcard pattern\n", len(tos))
 			return
 		}
 	}
@@ -71,21 +71,21 @@ func runCpMvOp(op string, paths ...string) {
 			})
 			if err != nil {
 				fmt.Println(err)
-				fmt.Println("文件/目录拷贝失败: ")
+				fmt.Println("File/directory copy failed:")
 				fmt.Printf("%s <-> %s\n", from[0], to)
 				return
 			}
-			fmt.Println("文件/目录拷贝成功: ")
+			fmt.Println("File/directory copy succeeded:")
 			fmt.Printf("%s <-> %s\n", from[0], to)
 		} else { // 重命名
 			err = pcs.Rename(from[0], path.Clean(to))
 			if err != nil {
 				fmt.Println(err)
-				fmt.Println("重命名失败: ")
+				fmt.Println("Rename failed:")
 				fmt.Printf("%s -> %s\n", from[0], to)
 				return
 			}
-			fmt.Println("重命名成功: ")
+			fmt.Println("Rename succeeded:")
 			fmt.Printf("%s -> %s\n", from[0], to)
 		}
 		return
@@ -95,7 +95,7 @@ func runCpMvOp(op string, paths ...string) {
 	}
 
 	if !toInfo.Isdir {
-		fmt.Printf("目标 %s 不是一个目录, 操作失败\n", toInfo.Path)
+		fmt.Printf("Target %s is not a directory, operation failed\n", toInfo.Path)
 		return
 	}
 
@@ -113,21 +113,21 @@ func runCpMvOp(op string, paths ...string) {
 		err = pcs.Copy(cj.List...)
 		if err != nil {
 			fmt.Println(err)
-			fmt.Println("操作失败, 以下文件/目录拷贝失败: ")
+			fmt.Println("Operation failed, the following files/directories failed to copy:")
 			fmt.Println(cj)
 			return
 		}
-		fmt.Println("操作成功, 以下文件/目录拷贝成功: ")
+		fmt.Println("Operation succeeded, copied files/directories:")
 		fmt.Println(cj)
 	case "move":
 		err = pcs.Move(cj.List...)
 		if err != nil {
 			fmt.Println(err)
-			fmt.Println("操作失败, 以下文件/目录移动失败: ")
+			fmt.Println("Operation failed, the following files/directories failed to move:")
 			fmt.Println(cj)
 			return
 		}
-		fmt.Println("操作成功, 以下文件/目录移动成功: ")
+		fmt.Println("Operation succeeded, moved files/directories:")
 		fmt.Println(cj)
 	default:
 		panic("Unknown operation:" + op)
@@ -138,7 +138,7 @@ func runCpMvOp(op string, paths ...string) {
 // cpmvPathValid 检查路径的有效性
 func cpmvPathValid(paths ...string) (err error) {
 	if len(paths) <= 1 {
-		return fmt.Errorf("参数不完整")
+		return fmt.Errorf("incomplete arguments")
 	}
 
 	return nil

@@ -46,16 +46,16 @@ func (pcs *BaiduPCS) ExtractShareInfo(shareURL, shardID, shareUK, bdstoken strin
 		"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
 	})
 	if panError != nil {
-		res["ErrMsg"] = "提交分享项查询请求时发生错误"
+		res["ErrMsg"] = "failed to submit share query request"
 		return
 	}
 	defer dataReadCloser.Close()
 	body, _ := ioutil.ReadAll(dataReadCloser)
 	errno := gjson.Get(string(body), `errno`).Int()
 	if errno != 0 {
-		res["ErrMsg"] = fmt.Sprintf("未知错误, 错误码%d", errno)
+		res["ErrMsg"] = fmt.Sprintf("unknown error, code %d", errno)
 		if errno == 8001 {
-			res["ErrMsg"] = "已触发验证, 请稍后再试"
+			res["ErrMsg"] = "verification was triggered, please try again later"
 		}
 		return
 	}
@@ -98,16 +98,16 @@ func (pcs *BaiduPCS) PostShareQuery(url string, referer string, data map[string]
 	})
 	res = make(map[string]string)
 	if panError != nil {
-		res["ErrMsg"] = "提交分享项查询请求时发生错误"
+		res["ErrMsg"] = "failed to submit share query request"
 		return
 	}
 	defer dataReadCloser.Close()
 	body, _ := ioutil.ReadAll(dataReadCloser)
 	errno := gjson.Get(string(body), `errno`).Int()
 	if errno != 0 {
-		res["ErrMsg"] = fmt.Sprintf("未知错误, 错误码%d", errno)
+		res["ErrMsg"] = fmt.Sprintf("unknown error, code %d", errno)
 		if errno == -9 {
-			res["ErrMsg"] = "提取码错误"
+			res["ErrMsg"] = "invalid extraction code"
 		}
 		return
 	}
@@ -130,7 +130,7 @@ func (pcs *BaiduPCS) AccessSharePage(featurestr string, first bool) (tokens map[
 	dataReadCloser, panError := pcs.sendReqReturnReadCloser(reqTypePan, OperationShareFileSavetoLocal, http.MethodGet, shareLink, nil, headers)
 
 	if panError != nil {
-		tokens["ErrMsg"] = "访问分享页失败"
+		tokens["ErrMsg"] = "failed to access share page"
 		return
 	}
 	defer dataReadCloser.Close()
@@ -138,17 +138,17 @@ func (pcs *BaiduPCS) AccessSharePage(featurestr string, first bool) (tokens map[
 	notFoundFlag := strings.Contains(string(body), "platform-non-found")
 	errorPageTitle := strings.Contains(string(body), "error-404")
 	if errorPageTitle {
-		tokens["ErrMsg"] = "页面不存在"
+		tokens["ErrMsg"] = "page not found"
 		return
 	}
 	if notFoundFlag {
-		tokens["ErrMsg"] = "分享链接已失效"
+		tokens["ErrMsg"] = "share link has expired"
 		return
 	} else {
 		re, _ := regexp.Compile(`(\{.+?loginstate.+?\})\);`)
 		sub := re.FindSubmatch(body)
 		if len(sub) < 2 {
-			tokens["ErrMsg"] = "请确认登录参数中已经包含了网盘STOKEN"
+			tokens["ErrMsg"] = "please make sure login parameters include netdisk STOKEN"
 			return
 		}
 		tokens["bdstoken"] = gjson.Get(string(sub[1]), `bdstoken`).String()
@@ -176,25 +176,25 @@ func (pcs *BaiduPCS) GenerateRequestQuery(mode string, params map[string]string)
 	dataReadCloser, panError := pcs.sendReqReturnReadCloser(reqTypePan, OperationShareFileSavetoLocal, mode, params["shareUrl"], postdata, headers)
 	if panError != nil {
 		res["ErrNo"] = "1"
-		res["ErrMsg"] = "网络错误"
+		res["ErrMsg"] = "network error"
 		return
 	}
 	defer dataReadCloser.Close()
 	body, err := ioutil.ReadAll(dataReadCloser)
 	if err != nil {
 		res["ErrNo"] = "-1"
-		res["ErrMsg"] = "未知错误"
+		res["ErrMsg"] = "unknown error"
 		return
 	}
 	if !gjson.Valid(string(body)) {
 		res["ErrNo"] = "2"
-		res["ErrMsg"] = "返回json解析错误"
+		res["ErrMsg"] = "failed to parse returned json"
 		return
 	}
 	errno := gjson.Get(string(body), `errno`).Int()
 	if errno != 0 {
 		res["ErrNo"] = "3"
-		res["ErrMsg"] = "获取分享项元数据错误"
+		res["ErrMsg"] = "failed to get share metadata"
 		if mode == "POST" && errno == 12 {
 			path := gjson.Get(string(body), `info.0.path`).String()
 			_, file := filepath.Split(path) // Should be path.Split here, but never mind~
@@ -203,16 +203,16 @@ func (pcs *BaiduPCS) GenerateRequestQuery(mode string, params map[string]string)
 			targetFileNumsLimit := gjson.Get(string(body), `target_file_nums_limit`).Int()
 			if targetFileNums > targetFileNumsLimit {
 				res["ErrNo"] = "4"
-				res["ErrMsg"] = fmt.Sprintf("转存文件数%d超过当前用户上限, 当前用户单次最大转存数%d", targetFileNums, targetFileNumsLimit)
+				res["ErrMsg"] = fmt.Sprintf("number of files to transfer (%d) exceeds current user limit (%d per transfer)", targetFileNums, targetFileNumsLimit)
 				res["limit"] = fmt.Sprintf("%d", targetFileNumsLimit)
 			} else if _errno == -30 {
 				res["ErrNo"] = "9"
-				res["ErrMsg"] = fmt.Sprintf("当前目录下已有%s同名文件/文件夹", file)
+				res["ErrMsg"] = fmt.Sprintf("a file/folder named %s already exists in the current directory", file)
 			} else {
-				res["ErrMsg"] = fmt.Sprintf("未知错误, 错误代码%d", _errno)
+				res["ErrMsg"] = fmt.Sprintf("unknown error, code %d", _errno)
 			}
 		} else if mode == "POST" && errno == 4 {
-			res["ErrMsg"] = fmt.Sprintf("文件重复")
+			res["ErrMsg"] = "duplicate file"
 		}
 		return
 	}
@@ -229,7 +229,7 @@ func (pcs *BaiduPCS) GenerateRequestQuery(mode string, params map[string]string)
 		res["filenames"] = filenamesStr[1:]
 	}
 	if len(gjson.Get(string(body), `info.#.fsid`).Array()) > 1 {
-		res["filename"] += "等多个文件/文件夹"
+		res["filename"] += " and multiple files/folders"
 	}
 	return
 }

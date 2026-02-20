@@ -87,13 +87,13 @@ func (pcse *PCSErrInfo) Error() string {
 		}
 
 		code, msg := findPCSErr(pcse.ErrCode, pcse.ErrMsg)
-		return fmt.Sprintf("%s: 遇到错误, %s, 代码: %d, 消息: %s", pcse.Operation, StrRemoteError, code, msg)
+		return fmt.Sprintf("%s: encountered %s, code: %d, message: %s", pcse.Operation, StrRemoteError, code, msg)
 	case ErrTypeOthers:
 		if pcse.Err == nil {
 			return fmt.Sprintf("%s: %s", pcse.Operation, StrSuccess)
 		}
 
-		return fmt.Sprintf("%s, 遇到错误, %s", pcse.Operation, pcse.Err)
+		return fmt.Sprintf("%s, encountered error: %s", pcse.Operation, pcse.Err)
 	default:
 		panic("pcserrorinfo: unknown ErrType")
 	}
@@ -105,13 +105,13 @@ func findPCSErr(errCode int, errMsg string) (int, string) {
 	case 0:
 		return errCode, ""
 	case 31045: // user not exists
-		return errCode, "操作失败, 可能百度帐号登录状态过期, 请尝试重新登录, 消息: " + errMsg
+		return errCode, "operation failed, login status may have expired, please log in again, message: " + errMsg
 	case 31061: // file already exists
-		return errCode, "文件已存在"
+		return errCode, "file already exists"
 	case 31066: // file does not exist
-		return errCode, "文件或目录不存在"
+		return errCode, "file or directory does not exist"
 	case 31079: // file md5 not found, you should use upload api to upload the whole file.
-		return errCode, "秒传文件失败"
+		return errCode, "rapid upload failed"
 	}
 	return errCode, errMsg
 }

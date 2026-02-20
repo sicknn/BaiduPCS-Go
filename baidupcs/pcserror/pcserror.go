@@ -41,15 +41,15 @@ const (
 
 const (
 	// StrSuccess 操作成功
-	StrSuccess = "操作成功"
+	StrSuccess = "success"
 	// StrInternalError 内部错误
-	StrInternalError = "内部错误"
+	StrInternalError = "internal error"
 	// StrRemoteError 远端服务器返回错误
-	StrRemoteError = "远端服务器返回错误"
+	StrRemoteError = "remote server error"
 	// StrNetError 网络错误
-	StrNetError = "网络错误"
+	StrNetError = "network error"
 	// StrJSONParseError json 数据解析失败
-	StrJSONParseError = "json 数据解析失败"
+	StrJSONParseError = "failed to parse json"
 )
 
 // DecodePCSJSONError 解析PCS JSON的错误

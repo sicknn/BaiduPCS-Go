@@ -37,47 +37,47 @@ type info struct {
 // CheckUpdate 检测更新
 func CheckUpdate(version string, yes bool) {
 	if !checkaccess.AccessRDWR(pcsutil.ExecutablePath()) {
-		fmt.Printf("程序目录不可写, 无法更新.\n")
+		fmt.Printf("Program directory is not writable, update cannot continue.\n")
 		return
 	}
-	fmt.Println("检测更新中, 稍候...")
+	fmt.Println("Checking for updates, please wait...")
 	c := pcsconfig.Config.HTTPClient()
 	resp, err := c.Req(http.MethodGet, "https://api.github.com/repos/qjfoidnh/BaiduPCS-Go/releases/latest", nil, nil)
 	if resp != nil {
 		defer resp.Body.Close()
 	}
 	if err != nil {
-		fmt.Printf("获取数据错误: %s\n", err)
+		fmt.Printf("Failed to fetch data: %s\n", err)
 		return
 	}
 
 	releaseInfo := ReleaseInfo{}
 	err = jsonhelper.UnmarshalData(resp.Body, &releaseInfo)
 	if err != nil {
-		fmt.Printf("json数据解析失败: %s\n", err)
+		fmt.Printf("Failed to parse JSON data: %s\n", err)
 		return
 	}
 
 	// 没有更新, 或忽略 Beta 版本, 和版本前缀不符的
 	if strings.Contains(releaseInfo.TagName, "Beta") || !strings.HasPrefix(releaseInfo.TagName, "v") || version >= releaseInfo.TagName {
-		fmt.Printf("未检测到更新!\n")
+		fmt.Printf("No updates found.\n")
 		return
 	}
 
-	fmt.Printf("检测到新版本: %s\n", releaseInfo.TagName)
+	fmt.Printf("New version found: %s\n", releaseInfo.TagName)
 
 	line := pcsliner.NewLiner()
 	defer line.Close()
 
 	if !yes {
-		y, err := line.State.Prompt("是否进行更新 (y/n): ")
+		y, err := line.State.Prompt("Proceed with update? (y/n): ")
 		if err != nil {
-			fmt.Printf("输入错误: %s\n", err)
+			fmt.Printf("Input error: %s\n", err)
 			return
 		}
 
 		if y != "y" && y != "Y" {
-			fmt.Printf("更新取消.\n")
+			fmt.Printf("Update cancelled.\n")
 			return
 		}
 	}
@@ -128,7 +128,7 @@ func CheckUpdate(version string, yes bool) {
 	var target info
 	switch len(targetList) {
 	case 0:
-		fmt.Printf("未匹配到当前系统的程序更新文件, GOOS: %s, GOARCH: %s\n", runtime.GOOS, runtime.GOARCH)
+		fmt.Printf("No update file matches this system, GOOS: %s, GOARCH: %s\n", runtime.GOOS, runtime.GOARCH)
 		return
 	case 1:
 		target = *targetList[0]
@@ -139,7 +139,7 @@ func CheckUpdate(version string, yes bool) {
 		}
 
 		fmt.Println()
-		t, err := line.State.Prompt("输入序号以下载更新: ")
+		t, err := line.State.Prompt("Enter index to download update: ")
 		if err != nil {
 			fmt.Printf("%s\n", err)
 			return
@@ -147,12 +147,12 @@ func CheckUpdate(version string, yes bool) {
 
 		i, err := strconv.Atoi(t)
 		if err != nil {
-			fmt.Printf("输入错误: %s\n", err)
+			fmt.Printf("Input error: %s\n", err)
 			return
 		}
 
 		if i < 0 || i >= len(targetList) {
-			fmt.Printf("输入错误: 序号不在范围内\n")
+			fmt.Printf("Input error: index out of range\n")
 			return
 		}
 
@@ -164,7 +164,7 @@ func CheckUpdate(version string, yes bool) {
 		return
 	}
 
-	fmt.Printf("准备下载更新: %s\n", target.filename)
+	fmt.Printf("Preparing to download update: %s\n", target.filename)
 
 	// 开始下载
 	buf := rio.NewBuffer(cachepool.RawMallocByteSlice(int(target.size)))
@@ -194,19 +194,19 @@ func CheckUpdate(version string, yes bool) {
 		fmt.Println()
 	})
 	der.OnSuccess(func() {
-		fmt.Printf("下载完毕\n")
+		fmt.Printf("Download completed\n")
 	})
 
 	err = der.Execute()
 	if err != nil {
-		fmt.Printf("下载发生错误: %s\n", err)
+		fmt.Printf("Download error: %s\n", err)
 		return
 	}
 
 	// 读取文件
 	reader, err := zip.NewReader(bytes.NewReader(buf.Bytes()), target.size)
 	if err != nil {
-		fmt.Printf("读取更新文件发生错误: %s\n", err)
+		fmt.Printf("Failed to read update file: %s\n", err)
 		return
 	}
 
@@ -226,7 +226,7 @@ func CheckUpdate(version string, yes bool) {
 
 		rc, err := zipFile.Open()
 		if err != nil {
-			fmt.Printf("解析 zip 文件错误: %s\n", err)
+			fmt.Printf("Failed to open zip entry: %s\n", err)
 			continue
 		}
 
@@ -241,15 +241,15 @@ func CheckUpdate(version string, yes bool) {
 
 		if err != nil {
 			errTimes++
-			fmt.Printf("发生错误, zip 路径: %s, 错误: %s\n", zipFile.Name, err)
+			fmt.Printf("Error processing zip path %s: %s\n", zipFile.Name, err)
 			continue
 		}
 	}
 
 	if errTimes == fileNum {
-		fmt.Printf("更新失败\n")
+		fmt.Printf("Update failed\n")
 		return
 	}
 
-	fmt.Printf("更新完毕, 请重启程序\n")
+	fmt.Printf("Update completed, please restart the program\n")
 }

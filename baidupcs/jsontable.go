@@ -86,7 +86,7 @@ func (clj *CpMvListJSON) String() string {
 	builder := &strings.Builder{}
 
 	tb := pcstable.NewTable(builder)
-	tb.SetHeader([]string{"#", "原路径", "目标路径"})
+	tb.SetHeader([]string{"#", "Source Path", "Target Path"})
 
 	for k := range clj.List {
 		if clj.List[k] == nil {

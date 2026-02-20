@@ -62,32 +62,32 @@ func (c *PCSConfig) AverageParallel() int {
 // PrintTable 输出表格
 func (c *PCSConfig) PrintTable() {
 	tb := pcstable.NewTable(os.Stdout)
-	tb.SetHeader([]string{"名称", "值", "建议值", "描述"})
+	tb.SetHeader([]string{"Name", "Value", "Suggested", "Description"})
 	tb.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
 	tb.SetColumnAlignment([]int{tablewriter.ALIGN_DEFAULT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT})
 	tb.AppendBulk([][]string{
-		[]string{"appid", fmt.Sprint(c.AppID), "", "百度 PCS 应用ID"},
-		[]string{"cache_size", converter.ConvertFileSize(int64(c.CacheSize), 2), "1KB ~ 256KB", "下载缓存, 如果硬盘占用高或下载速度慢, 请尝试调大此值"},
-		[]string{"max_parallel", strconv.Itoa(c.MaxParallel), "1 ~ 20", "下载总最大并发量, 非svip不可>1"},
-		[]string{"max_upload_parallel", strconv.Itoa(c.MaxUploadParallel), "1 ~ 100", "上传单文件最大并发量"},
-		[]string{"max_download_load", strconv.Itoa(c.MaxDownloadLoad), "1 ~ 5", "同时进行下载文件的最大数量"},
-		[]string{"max_download_rate", showMaxRate(c.MaxDownloadRate), "", "限制最大下载速度, 0代表不限制"},
-		[]string{"max_upload_rate", showMaxRate(c.MaxUploadRate), "", "限制最大上传速度, 0代表不限制"},
-		[]string{"max_upload_load", strconv.Itoa(c.MaxUploadLoad), "1 ~ 4", "同时进行上传文件的最大数量"},
-		[]string{"savedir", c.SaveDir, "", "下载文件的储存目录"},
-		[]string{"enable_https", fmt.Sprint(c.EnableHTTPS), "true", "启用 https"},
-		[]string{"force_login_username", fmt.Sprint(c.ForceLogin), "留空", "强制登录指定用户名, 适用于tieba用户信息接口不可用的情况, 如登录正常请留空"},
-		[]string{"ignore_illegal", fmt.Sprint(c.IgnoreIllegal), "false", "关闭上传文件的文件名非法字符检查"},
-		[]string{"upload_policy", fmt.Sprint(c.UPolicy), baidupcs.SkipPolicy, fmt.Sprintf("上传遇到重名文件时的处理策略, %s(默认，跳过)、%s(覆盖)、%s(仅跳过大小未变化的文件其余覆盖)",
+		[]string{"appid", fmt.Sprint(c.AppID), "", "Baidu PCS app ID"},
+		[]string{"cache_size", converter.ConvertFileSize(int64(c.CacheSize), 2), "1KB ~ 256KB", "Download cache size. Increase this if disk usage is high or download speed is slow"},
+		[]string{"max_parallel", strconv.Itoa(c.MaxParallel), "1 ~ 20", "Maximum total download concurrency (non-SVIP users cannot exceed 1)"},
+		[]string{"max_upload_parallel", strconv.Itoa(c.MaxUploadParallel), "1 ~ 100", "Maximum upload concurrency per file"},
+		[]string{"max_download_load", strconv.Itoa(c.MaxDownloadLoad), "1 ~ 5", "Maximum number of files downloading simultaneously"},
+		[]string{"max_download_rate", showMaxRate(c.MaxDownloadRate), "", "Maximum download speed limit, 0 means unlimited"},
+		[]string{"max_upload_rate", showMaxRate(c.MaxUploadRate), "", "Maximum upload speed limit, 0 means unlimited"},
+		[]string{"max_upload_load", strconv.Itoa(c.MaxUploadLoad), "1 ~ 4", "Maximum number of files uploading simultaneously"},
+		[]string{"savedir", c.SaveDir, "", "Directory to save downloaded files"},
+		[]string{"enable_https", fmt.Sprint(c.EnableHTTPS), "true", "Enable HTTPS"},
+		[]string{"force_login_username", fmt.Sprint(c.ForceLogin), "empty", "Force login username; use only when tieba user-info API is unavailable"},
+		[]string{"ignore_illegal", fmt.Sprint(c.IgnoreIllegal), "false", "Disable illegal-character check on upload filenames"},
+		[]string{"upload_policy", fmt.Sprint(c.UPolicy), baidupcs.SkipPolicy, fmt.Sprintf("Policy for duplicate filenames: %s (default, skip), %s (overwrite), %s (skip unchanged-size files, overwrite others)",
 			baidupcs.SkipPolicy, baidupcs.OverWritePolicy, baidupcs.RsyncPolicy)},
-		[]string{"user_agent", c.UserAgent, requester.DefaultUserAgent, "浏览器标识"},
-		[]string{"pcs_ua", c.PCSUA, "", "PCS 浏览器标识"},
-		[]string{"pcs_addr", c.PCSAddr, "pcs.baidu.com", "PCS 服务器地址"},
-		[]string{"fix_pcs_addr", fmt.Sprint(c.FixPCSAddr), "false", "不使用动态PCS服务器地址, 通常情况保持默认即可"},
-		[]string{"pan_ua", c.PanUA, baidupcs.NetdiskUA, "Pan 浏览器标识"},
-		[]string{"proxy", c.Proxy, "", "设置代理, 支持 http/socks5 代理"},
-		[]string{"proxy_hostnames", c.ProxyHostnames, "", "设置走代理的域名范围, 多个域名以逗号分隔, 留空表示全部代理. 国外VPS遇上传问题可尝试代理pan.baidu.com回国"},
-		[]string{"local_addrs", c.LocalAddrs, "", "设置本地网卡地址, 多个地址用逗号隔开"},
+		[]string{"user_agent", c.UserAgent, requester.DefaultUserAgent, "Browser user-agent"},
+		[]string{"pcs_ua", c.PCSUA, "", "PCS user-agent"},
+		[]string{"pcs_addr", c.PCSAddr, "pcs.baidu.com", "PCS server address"},
+		[]string{"fix_pcs_addr", fmt.Sprint(c.FixPCSAddr), "false", "Use static PCS server address instead of dynamic selection"},
+		[]string{"pan_ua", c.PanUA, baidupcs.NetdiskUA, "Pan user-agent"},
+		[]string{"proxy", c.Proxy, "", "Proxy setting, supports http/socks5"},
+		[]string{"proxy_hostnames", c.ProxyHostnames, "", "Hostnames to proxy, comma-separated; empty means proxy all hostnames"},
+		[]string{"local_addrs", c.LocalAddrs, "", "Local network interface addresses, comma-separated"},
 	})
 	tb.Render()
 }

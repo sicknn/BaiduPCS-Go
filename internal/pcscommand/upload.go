@@ -68,19 +68,19 @@ func RunUpload(localPaths []string, savePath string, opt *UploadOptions) {
 
 	err := matchPathByShellPatternOnce(&savePath)
 	if err != nil {
-		fmt.Printf("警告: 上传文件, 获取网盘路径 %s 错误, %s\n", savePath, err)
+		fmt.Printf("Warning: failed to resolve remote path %s for upload, %s\n", savePath, err)
 	}
 
 	switch len(localPaths) {
 	case 0:
-		fmt.Printf("本地路径为空\n")
+		fmt.Printf("Local path is empty\n")
 		return
 	}
 
 	// 打开上传状态
 	uploadDatabase, err := pcsupload.NewUploadingDatabase()
 	if err != nil {
-		fmt.Printf("打开上传未完成数据库错误: %s\n", err)
+		fmt.Printf("Failed to open unfinished upload database: %s\n", err)
 		return
 	}
 	defer uploadDatabase.Close()
@@ -96,7 +96,7 @@ func RunUpload(localPaths []string, savePath string, opt *UploadOptions) {
 		statistic = &pcsupload.UploadStatistic{}
 	)
 	fmt.Print("\n")
-	fmt.Printf("[0] 提示: 当前上传单个文件最大并发量为: %d, 最大同时上传文件数为: %d\n", opt.Parallel, opt.Load)
+	fmt.Printf("[0] Tip: max concurrency per file: %d, max concurrent uploading files: %d\n", opt.Parallel, opt.Load)
 
 	statistic.StartTimer() // 开始计时
 
@@ -105,7 +105,7 @@ func RunUpload(localPaths []string, savePath string, opt *UploadOptions) {
 	for k := range localPaths {
 		walkedFiles, err := pcsutil.WalkDir(localPaths[k], "")
 		if err != nil {
-			fmt.Printf("警告: 遍历错误: %s\n", err)
+			fmt.Printf("Warning: traversal error: %s\n", err)
 			continue
 		}
 
@@ -128,7 +128,7 @@ func RunUpload(localPaths []string, savePath string, opt *UploadOptions) {
 			}
 			subSavePath = strings.TrimPrefix(walkedFiles[k3], localPathDir)
 			if !opt.NoFilenameCheck && !pcsutil.ChPathLegal(walkedFiles[k3]) {
-				fmt.Printf("[0] %s 文件路径含有非法字符，已跳过!\n", walkedFiles[k3])
+				fmt.Printf("[0] %s contains illegal path characters, skipped\n", walkedFiles[k3])
 				continue
 			}
 			LoadCount++
@@ -147,13 +147,13 @@ func RunUpload(localPaths []string, savePath string, opt *UploadOptions) {
 			if LoadCount >= opt.Load {
 				LoadCount = opt.Load
 			}
-			fmt.Printf("[%s] 加入上传队列: %s\n", info.Id(), walkedFiles[k3])
+			fmt.Printf("[%s] Added to upload queue: %s\n", info.Id(), walkedFiles[k3])
 		}
 	}
 
 	// 没有添加任何任务
 	if executor.Count() == 0 {
-		fmt.Printf("未检测到上传的文件.\n")
+		fmt.Printf("No files detected for upload.\n")
 		return
 	}
 
@@ -163,12 +163,12 @@ func RunUpload(localPaths []string, savePath string, opt *UploadOptions) {
 	executor.Execute()
 
 	fmt.Printf("\n")
-	fmt.Printf("上传结束, 时间: %s, 总大小: %s\n", statistic.Elapsed()/1e6*1e6, converter.ConvertFileSize(statistic.TotalSize()))
+	fmt.Printf("Upload finished, elapsed: %s, total size: %s\n", statistic.Elapsed()/1e6*1e6, converter.ConvertFileSize(statistic.TotalSize()))
 
 	// 输出上传失败的文件列表
 	failedList := executor.FailedDeque()
 	if failedList.Size() != 0 {
-		fmt.Printf("以下文件上传失败: \n")
+		fmt.Printf("The following files failed to upload:\n")
 		tb := pcstable.NewTable(os.Stdout)
 		for e := failedList.Shift(); e != nil; e = failedList.Shift() {
 			item := e.(*taskframework.TaskInfoItem)

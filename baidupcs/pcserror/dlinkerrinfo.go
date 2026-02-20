@@ -84,13 +84,13 @@ func (dle *DlinkErrInfo) Error() string {
 			return fmt.Sprintf("%s: %s", dle.Operation, StrSuccess)
 		}
 
-		return fmt.Sprintf("%s: 遇到错误, %s, 代码: %d, 消息: %s", dle.Operation, StrRemoteError, dle.ErrNo, dle.Msg)
+		return fmt.Sprintf("%s: encountered %s, code: %d, message: %s", dle.Operation, StrRemoteError, dle.ErrNo, dle.Msg)
 	case ErrTypeOthers:
 		if dle.Err == nil {
 			return fmt.Sprintf("%s: %s", dle.Operation, StrSuccess)
 		}
 
-		return fmt.Sprintf("%s, 遇到错误, %s", dle.Operation, dle.Err)
+		return fmt.Sprintf("%s, encountered error: %s", dle.Operation, dle.Err)
 	default:
 		panic("dlinkerrinfo: unknown ErrType")
 	}

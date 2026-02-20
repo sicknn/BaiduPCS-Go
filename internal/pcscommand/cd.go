@@ -22,14 +22,14 @@ func RunChangeDirectory(targetPath string, isList bool) {
 	}
 
 	if !data.Isdir {
-		fmt.Printf("错误: %s 不是一个目录 (文件夹)\n", targetPath)
+		fmt.Printf("Error: %s is not a directory\n", targetPath)
 		return
 	}
 
 	GetActiveUser().Workdir = targetPath
 	pcsconfig.Config.Save()
 
-	fmt.Printf("改变工作目录: %s\n", targetPath)
+	fmt.Printf("Changed working directory: %s\n", targetPath)
 
 	if isList {
 		RunLs(".", nil, baidupcs.DefaultOrderOptions)

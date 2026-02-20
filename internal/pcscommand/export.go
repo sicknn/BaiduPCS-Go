@@ -42,11 +42,11 @@ func (task *etask) handleExportTaskError(l *list.List, failedList *list.List) {
 	// 不重试
 	switch task.err.GetError() {
 	case baidupcs.ErrGetRapidUploadInfoMD5NotFound, baidupcs.ErrGetRapidUploadInfoCrc32NotFound:
-		fmt.Printf("[%d] - [%s] 导出失败, 可能是服务器未刷新文件的md5, 请过一段时间再试一试\n", task.ID, task.path)
+		fmt.Printf("[%d] - [%s] Export failed, the server may not have refreshed file md5 yet, please try again later\n", task.ID, task.path)
 		failedList.PushBack(task)
 		return
 	case baidupcs.ErrFileTooLarge:
-		fmt.Printf("[%d] - [%s] 导出失败, 文件大于20GB, 无法导出\n", task.ID, task.path)
+		fmt.Printf("[%d] - [%s] Export failed, file is larger than 20GB and cannot be exported\n", task.ID, task.path)
 		failedList.PushBack(task)
 		return
 	}
@@ -54,11 +54,11 @@ func (task *etask) handleExportTaskError(l *list.List, failedList *list.List) {
 	// 未达到失败重试最大次数, 将任务推送到队列末尾
 	if task.retry < task.MaxRetry {
 		task.retry++
-		fmt.Printf("[%d] - [%s] 导出错误, %s, 重试 %d/%d\n", task.ID, task.path, task.err, task.retry, task.MaxRetry)
+		fmt.Printf("[%d] - [%s] Export error, %s, retry %d/%d\n", task.ID, task.path, task.err, task.retry, task.MaxRetry)
 		l.PushBack(task)
 		time.Sleep(3 * time.Duration(task.retry) * time.Second)
 	} else {
-		fmt.Printf("[%d] - [%s] 导出错误, %s\n", task.ID, task.path, task.err)
+		fmt.Printf("[%d] - [%s] Export error, %s\n", task.ID, task.path, task.err)
 		failedList.PushBack(task)
 	}
 }
@@ -99,7 +99,7 @@ func RunExport(pcspaths []string, opt *ExportOptions) {
 	}
 	defer saveFile.Close()
 	if !opt.StdOut {
-		fmt.Printf("导出的信息将保存在: %s\n", opt.SavePath)
+		fmt.Printf("Exported output will be saved to: %s\n", opt.SavePath)
 	}
 
 	var (
@@ -166,10 +166,10 @@ func RunExport(pcspaths []string, opt *ExportOptions) {
 			if len(fds) == 0 && !opt.StdOut {
 				_, writeErr = saveFile.Write(converter.ToBytes(fmt.Sprintf("BaiduPCS-Go mkdir \"%s\"\n", changeRootPath(task.rootPath, task.path, opt.RootPath))))
 				if writeErr != nil {
-					fmt.Printf("写入文件失败: %s\n", writeErr)
+					fmt.Printf("Failed to write file: %s\n", writeErr)
 					return // 直接返回
 				}
-				fmt.Printf("[%d] - [%s] 导出成功\n", task.ID, task.path)
+				fmt.Printf("[%d] - [%s] Export succeeded\n", task.ID, task.path)
 				continue
 			}
 
@@ -205,20 +205,20 @@ func RunExport(pcspaths []string, opt *ExportOptions) {
 		} else {
 			_, writeErr = saveFile.Write(converter.ToBytes(outTemplate))
 			if writeErr != nil {
-				fmt.Printf("写入文件失败: %s\n", writeErr)
+				fmt.Printf("Failed to write file: %s\n", writeErr)
 				return // 直接返回
 			}
 
-			fmt.Printf("[%d] - [%s] 导出成功\n", task.ID, task.path)
+			fmt.Printf("[%d] - [%s] Export succeeded\n", task.ID, task.path)
 		}
 	}
 	if opt.StdOut {
 		os.Remove(opt.SavePath)
-		fmt.Println("导出完毕")
+		fmt.Println("Export completed")
 	}
 
 	if failedList.Len() > 0 {
-		fmt.Printf("\n以下目录导出失败: \n")
+		fmt.Printf("\nThe following paths failed to export:\n")
 		fmt.Printf("%s\n", strings.Repeat("-", 100))
 		for e := failedList.Front(); e != nil; e = e.Next() {
 			et := e.Value.(*etask)

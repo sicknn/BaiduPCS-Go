@@ -298,30 +298,30 @@ func (pcs *BaiduPCS) CloudDlClearTask() (total int, pcsError pcserror.Error) {
 func (ci *CloudDlTaskInfo) ParseText() {
 	switch ci.Status {
 	case 0:
-		ci.StatusText = "下载成功"
+		ci.StatusText = "Download succeeded"
 	case 1:
-		ci.StatusText = "下载进行中"
+		ci.StatusText = "Downloading"
 	case 2:
-		ci.StatusText = "系统错误"
+		ci.StatusText = "System error"
 	case 3:
-		ci.StatusText = "资源不存在"
+		ci.StatusText = "Resource not found"
 	case 4:
-		ci.StatusText = "下载超时"
+		ci.StatusText = "Download timed out"
 	case 5:
-		ci.StatusText = "资源存在但下载失败"
+		ci.StatusText = "Resource exists but download failed"
 	case 6:
-		ci.StatusText = "存储空间不足"
+		ci.StatusText = "Insufficient storage space"
 	case 7:
-		ci.StatusText = "任务取消"
+		ci.StatusText = "Task cancelled"
 	default:
-		ci.StatusText = "未知状态码: " + strconv.Itoa(ci.Status)
+		ci.StatusText = "Unknown status code: " + strconv.Itoa(ci.Status)
 	}
 }
 
 func (cl CloudDlTaskList) String() string {
 	builder := &strings.Builder{}
 	tb := pcstable.NewTable(builder)
-	tb.SetHeader([]string{"#", "任务ID", "任务名称", "文件大小", "创建日期", "保存路径", "资源地址", "状态"})
+	tb.SetHeader([]string{"#", "Task ID", "Task Name", "File Size", "Created", "Save Path", "Source URL", "Status"})
 	for k, v := range cl {
 		tb.Append([]string{strconv.Itoa(k), strconv.FormatInt(v.TaskID, 10), v.TaskName, converter.ConvertFileSize(v.FileSize), pcstime.FormatTime(v.CreateTime), path.Clean(v.SavePath), v.SourceURL, v.StatusText})
 	}

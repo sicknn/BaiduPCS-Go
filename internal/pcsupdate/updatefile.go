@@ -35,12 +35,12 @@ func update(targetPath string, src io.Reader) error {
 
 	err = newFile.Close()
 	if err != nil {
-		fmt.Printf("Warning: 关闭文件发生错误: %s\n", err)
+		fmt.Printf("Warning: failed to close file: %s\n", err)
 	}
 
 	err = os.Remove(oldPath)
 	if err != nil {
-		fmt.Printf("Warning: 移除旧文件发生错误: %s\n", err)
+		fmt.Printf("Warning: failed to remove old file: %s\n", err)
 	}
 	return nil
 }

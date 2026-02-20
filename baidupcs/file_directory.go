@@ -122,7 +122,7 @@ func (pcs *BaiduPCS) FilesDirectoriesMeta(path string) (data *FileDirectory, pcs
 		return nil, &pcserror.PCSErrInfo{
 			Operation: OperationFilesDirectoriesMeta,
 			ErrType:   pcserror.ErrTypeOthers,
-			Err:       errors.New("未知返回数据"),
+			Err:       errors.New("unknown returned data"),
 		}
 	}
 	return fds[0], nil
@@ -273,22 +273,22 @@ func (f *FileDirectory) String() string {
 
 	if f.Isdir {
 		tb.AppendBulk([][]string{
-			[]string{"类型", "目录"},
-			[]string{"目录路径", f.Path},
-			[]string{"目录名称", f.Filename},
+			[]string{"Type", "Directory"},
+			[]string{"Directory Path", f.Path},
+			[]string{"Directory Name", f.Filename},
 		})
 	} else {
 		var md5info string
 		if len(f.BlockList) > 1 {
-			md5info = "md5 (可能不正确)"
+			md5info = "md5 (possibly inaccurate)"
 		} else {
-			md5info = "md5 (截图请打码)"
+			md5info = "md5 (mask before sharing screenshots)"
 		}
 		tb.AppendBulk([][]string{
-			[]string{"类型", "文件"},
-			[]string{"文件路径", f.Path},
-			[]string{"文件名称", f.Filename},
-			[]string{"文件大小", strconv.FormatInt(f.Size, 10) + ", " + converter.ConvertFileSize(f.Size)},
+			[]string{"Type", "File"},
+			[]string{"File Path", f.Path},
+			[]string{"File Name", f.Filename},
+			[]string{"File Size", strconv.FormatInt(f.Size, 10) + ", " + converter.ConvertFileSize(f.Size)},
 			[]string{md5info, f.MD5},
 		})
 	}
@@ -296,12 +296,12 @@ func (f *FileDirectory) String() string {
 	tb.Append([]string{"app_id", strconv.FormatInt(f.AppID, 10)})
 	tb.Append([]string{"fs_id", strconv.FormatInt(f.FsID, 10)})
 	tb.AppendBulk([][]string{
-		[]string{"创建日期", pcstime.FormatTime(f.Ctime)},
-		[]string{"修改日期", pcstime.FormatTime(f.Mtime)},
+		[]string{"Created", pcstime.FormatTime(f.Ctime)},
+		[]string{"Modified", pcstime.FormatTime(f.Mtime)},
 	})
 
 	if f.Ifhassubdir {
-		tb.Append([]string{"是否含有子目录", "true"})
+		tb.Append([]string{"Contains Subdirectory", "true"})
 	}
 
 	tb.Render()

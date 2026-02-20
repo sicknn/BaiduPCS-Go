@@ -42,7 +42,7 @@ func RunLocateDownload(pcspaths []string, opt *LocateDownloadOption) {
 		}
 
 		tb := pcstable.NewTable(os.Stdout)
-		tb.SetHeader([]string{"#", "fs_id", "路径", "链接"})
+		tb.SetHeader([]string{"#", "fs_id", "Path", "Link"})
 
 		var (
 			i          int
@@ -58,25 +58,25 @@ func RunLocateDownload(pcspaths []string, opt *LocateDownloadOption) {
 			}
 		}
 		tb.Render()
-		fmt.Printf("\n注意: 以上链接不能直接访问, 需要登录百度帐号才可以下载\n")
+		fmt.Printf("\nNote: the links above are not directly accessible; you must be logged in to a Baidu account to download\n")
 		return
 	}
 
 	for i, pcspath := range absPaths {
 		info, err := pcs.LocateDownload(pcspath)
 		if err != nil {
-			fmt.Printf("[%d] %s, 路径: %s\n", i, err, pcspath)
+			fmt.Printf("[%d] %s, path: %s\n", i, err, pcspath)
 			continue
 		}
 
 		fmt.Printf("[%d] %s: \n", i, pcspath)
 		tb := pcstable.NewTable(os.Stdout)
-		tb.SetHeader([]string{"#", "链接"})
+		tb.SetHeader([]string{"#", "Link"})
 		for k, u := range info.URLStrings(pcsconfig.Config.EnableHTTPS) {
 			tb.Append([]string{strconv.Itoa(k), u.String()})
 		}
 		tb.Render()
 		fmt.Println()
 	}
-	fmt.Printf("提示: 访问下载链接, 需将下载器的 User-Agent 设置为: %s\n", pcsconfig.Config.PanUA)
+	fmt.Printf("Tip: to access download links, set your downloader User-Agent to: %s\n", pcsconfig.Config.PanUA)
 }

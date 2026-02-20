@@ -85,13 +85,13 @@ func (pane *PanErrorInfo) Error() string {
 		}
 
 		errmsg := FindPanErr(pane.ErrNo)
-		return fmt.Sprintf("%s: 遇到错误, %s, 代码: %d, 消息: %s", pane.Operation, StrRemoteError, pane.ErrNo, errmsg)
+		return fmt.Sprintf("%s: encountered %s, code: %d, message: %s", pane.Operation, StrRemoteError, pane.ErrNo, errmsg)
 	case ErrTypeOthers:
 		if pane.Err == nil {
 			return fmt.Sprintf("%s: %s", pane.Operation, StrSuccess)
 		}
 
-		return fmt.Sprintf("%s, 遇到错误, %s", pane.Operation, pane.Err)
+		return fmt.Sprintf("%s, encountered error: %s", pane.Operation, pane.Err)
 	default:
 		panic("panerrorinfo: unknown ErrType")
 	}
@@ -103,76 +103,76 @@ func FindPanErr(errno int) (errmsg string) {
 	case 0:
 		return StrSuccess
 	case -1:
-		return "由于您分享了违反相关法律法规的文件，分享功能已被禁用，之前分享出去的文件不受影响。"
+		return "Sharing has been disabled because prohibited content was shared. Previously shared files are unaffected."
 	case -2:
-		return "用户不存在,请刷新页面后重试"
+		return "User does not exist, please refresh and try again"
 	case -3:
-		return "文件不存在,请刷新页面后重试"
+		return "File does not exist, please refresh and try again"
 	case -4:
-		return "登录信息有误，请重新登录试试"
+		return "Login information is invalid, please log in again"
 	case -5:
-		return "host_key和user_key无效"
+		return "host_key and user_key are invalid"
 	case -6:
-		return "请重新登录"
+		return "Please log in again"
 	case -7:
-		return "该分享已删除或已取消"
+		return "This share has been deleted or cancelled"
 	case -8:
-		return "已存在同名文件"
+		return "A file with the same name already exists"
 	case -9:
-		return "文件不存在"
+		return "File does not exist"
 	case -10:
-		return "分享外链已经达到最大上限100000条，不能再次分享"
+		return "Share-link limit reached (100000), cannot share again"
 	case -11:
-		return "验证cookie无效"
+		return "Verification cookie is invalid"
 	case -12:
-		return "访问密码错误"
+		return "Incorrect extraction password"
 	case -14:
-		return "对不起，短信分享每天限制20条，你今天已经分享完，请明天再来分享吧！"
+		return "SMS sharing is limited to 20 per day, please try again tomorrow"
 	case -15:
-		return "对不起，邮件分享每天限制20封，你今天已经分享完，请明天再来分享吧！"
+		return "Email sharing is limited to 20 per day, please try again tomorrow"
 	case -16:
-		return "对不起，该文件已经限制分享！"
+		return "This file is restricted from sharing"
 	case -17:
-		return "文件分享超过限制"
+		return "File sharing exceeds limit"
 	case -19:
-		return "需要输入验证码"
+		return "Captcha input is required"
 	case -21:
-		return "分享已取消或分享信息无效"
+		return "Share was cancelled or share info is invalid"
 	case -30:
-		return "文件已存在"
+		return "File already exists"
 	case -31:
-		return "文件保存失败"
+		return "Failed to save file"
 	case -33:
-		return "一次支持操作999个，减点试试吧"
+		return "Only up to 999 items are supported per operation"
 	case -62:
-		return "可能需要输入验证码"
+		return "Captcha may be required"
 	case -70:
-		return "你分享的文件中包含病毒或疑似病毒，为了你和他人的数据安全，换个文件分享吧"
+		return "Shared file contains or may contain a virus; please share a different file"
 	case 2:
-		return "请稍后再试, 或更换保存路径"
+		return "Please try again later, or change the save path"
 	case 3:
-		return "未登录或帐号无效"
+		return "Not logged in or account is invalid"
 	case 4:
-		return "存储好像出问题了，请稍候再试"
+		return "Storage seems unavailable, please try again later"
 	case 105:
-		return "啊哦，链接错误没找到文件，请打开正确的分享链接"
+		return "Invalid link, file not found. Please open the correct share link"
 	case 108:
-		return "文件名有敏感词，优化一下吧"
+		return "Filename contains sensitive words, please modify it"
 	case 110:
-		return "分享次数超出限制，可以到“我的分享”中查看已分享的文件链接"
+		return "Share count exceeded limit. Check shared links in \"My Shares\""
 	case 112:
-		return "页面已过期，请刷新后重试"
+		return "Page has expired, refresh and try again"
 	case 113:
-		return "签名错误"
+		return "Signature error"
 	case 114:
-		return "当前任务不存在，保存失败"
+		return "Current task does not exist, save failed"
 	case 115:
-		return "该文件禁止分享"
+		return "This file is forbidden to share"
 	case 132:
-		return "您的帐号可能存在安全风险，为了确保为您本人操作，请先进行安全验证。"
+		return "Your account may have security risks; complete security verification first"
 	case 9019:
-		return "accesstoken未设置或过期, 请使用setastoken命令设置`"
+		return "accessToken is not set or has expired, use the setastoken command"
 	default:
-		return "未知错误"
+		return "Unknown error"
 	}
 }

@@ -86,13 +86,13 @@ func (pane *XPanErrorInfo) Error() string {
 		}
 
 		errmsg := FindXPanErr(pane.ErrNo, pane.ReturnType)
-		return fmt.Sprintf("%s: 遇到错误, %s, 代码: %d, 消息: %s", pane.Operation, StrRemoteError, pane.ErrNo, errmsg)
+		return fmt.Sprintf("%s: encountered %s, code: %d, message: %s", pane.Operation, StrRemoteError, pane.ErrNo, errmsg)
 	case ErrTypeOthers:
 		if pane.Err == nil {
 			return fmt.Sprintf("%s: %s", pane.Operation, StrSuccess)
 		}
 
-		return fmt.Sprintf("%s, 遇到错误, %s", pane.Operation, pane.Err)
+		return fmt.Sprintf("%s, encountered error: %s", pane.Operation, pane.Err)
 	default:
 		panic("xpanerrorinfo: unknown ErrType")
 	}
@@ -105,8 +105,8 @@ func FindXPanErr(errno, returnType int) (errmsg string) {
 		if returnType == 2 {
 			return StrSuccess
 		}
-		return fmt.Sprintf("错误类型: %d", returnType)
+		return fmt.Sprintf("error type: %d", returnType)
 	default:
-		return fmt.Sprintf("错误类型: %d", returnType)
+		return fmt.Sprintf("error type: %d", returnType)
 	}
 }

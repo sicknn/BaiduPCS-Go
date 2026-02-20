@@ -62,15 +62,15 @@ const (
 	//DownloadSuffix 文件下载后缀
 	DownloadSuffix = ".BaiduPCS-Go-downloading"
 	//StrDownloadInitError 初始化下载发生错误
-	StrDownloadInitError = "初始化下载发生错误"
+	StrDownloadInitError = "download initialization failed"
 	// StrDownloadFailed 下载文件失败
-	StrDownloadFailed = "下载文件失败"
+	StrDownloadFailed = "download file failed"
 	// StrDownloadGetDlinkFailed 获取下载链接失败
-	StrDownloadGetDlinkFailed = "获取下载链接失败"
+	StrDownloadGetDlinkFailed = "failed to get download link"
 	// StrDownloadChecksumFailed 检测文件有效性失败
-	StrDownloadChecksumFailed = "检测文件有效性失败"
+	StrDownloadChecksumFailed = "file integrity check failed"
 	// StrDownloadCheckLengthFailed 检测文件大小一致性失败
-	StrDownloadCheckLengthFailed = "检测文件大小一致性失败"
+	StrDownloadCheckLengthFailed = "file size consistency check failed"
 	// DefaultDownloadMaxRetry 默认下载失败最大重试次数
 	DefaultDownloadMaxRetry = 3
 )
@@ -188,7 +188,7 @@ func (dtu *DownloadTaskUnit) download(downloadURL string, client *requester.HTTP
 
 	der.OnExecute(func() {
 		if dtu.Cfg.IsTest {
-			fmt.Printf("[%s] 测试下载开始\n\n", dtu.taskInfo.Id())
+			fmt.Printf("[%s] Test download started\n\n", dtu.taskInfo.Id())
 		}
 	})
 
@@ -219,13 +219,13 @@ func (dtu *DownloadTaskUnit) download(downloadURL string, client *requester.HTTP
 		if dtu.IsExecutedPermission {
 			err = file.Chmod(0766)
 			if err != nil {
-				fmt.Printf("[%s] 警告, 加执行权限错误: %s\n", dtu.taskInfo.Id(), err)
+				fmt.Printf("[%s] Warning: failed to set executable permission: %s\n", dtu.taskInfo.Id(), err)
 			}
 		}
 
-		fmt.Printf("[%s] 下载完成, 保存位置: %s\n", dtu.taskInfo.Id(), dtu.SavePath)
+		fmt.Printf("[%s] Download completed, saved to: %s\n", dtu.taskInfo.Id(), dtu.SavePath)
 	} else {
-		fmt.Printf("[%s] 测试下载结束\n", dtu.taskInfo.Id())
+		fmt.Printf("[%s] Test download finished\n", dtu.taskInfo.Id())
 	}
 
 	return nil
@@ -280,7 +280,7 @@ func (dtu *DownloadTaskUnit) handleError(result *taskframework.TaskUnitRunResult
 }
 
 func (dtu *DownloadTaskUnit) execPanDownload(dlink string, result *taskframework.TaskUnitRunResult, okPtr *bool) {
-	dtu.verboseInfof("[%s] 获取到下载链接: %s\n", dtu.taskInfo.Id(), dlink)
+	dtu.verboseInfof("[%s] Download link acquired: %s\n", dtu.taskInfo.Id(), dlink)
 
 	client := dtu.panHTTPClient()
 	activePCS := pcsconfig.Config.ActiveUserBaiduPCS()
@@ -364,13 +364,13 @@ func (dtu *DownloadTaskUnit) checkFileValid(result *taskframework.TaskUnitRunRes
 	}
 	if dtu.Cfg.IsTest || dtu.NoCheck {
 		// 不检测文件有效性
-		fmt.Printf("[%s] 跳过文件有效性检验\n", dtu.taskInfo.Id())
+		fmt.Printf("[%s] Skipping file integrity check\n", dtu.taskInfo.Id())
 		return true
 	}
 
 	if dtu.FileInfo.Size >= 128*converter.MB {
 		// 大文件, 输出一句提示消息
-		fmt.Printf("[%s] 开始检验文件有效性, 请稍候...\n", dtu.taskInfo.Id())
+		fmt.Printf("[%s] Starting file integrity check, please wait...\n", dtu.taskInfo.Id())
 	}
 
 	// 就在这里处理校验出错
@@ -381,9 +381,9 @@ func (dtu *DownloadTaskUnit) checkFileValid(result *taskframework.TaskUnitRunRes
 		switch err {
 		case ErrDownloadNotSupportChecksum:
 			// 文件不支持校验
-			result.ResultMessage = "检验文件有效性"
+			result.ResultMessage = "check file integrity"
 			result.Err = err
-			fmt.Printf("[%s] 检验文件有效性: %s\n", dtu.taskInfo.Id(), err)
+			fmt.Printf("[%s] File integrity check: %s\n", dtu.taskInfo.Id(), err)
 			return true
 		case ErrDownloadFileBanned:
 			// 违规文件
@@ -401,7 +401,7 @@ func (dtu *DownloadTaskUnit) checkFileValid(result *taskframework.TaskUnitRunRes
 		}
 	}
 
-	fmt.Printf("[%s] 检验文件有效性成功: %s\n", dtu.taskInfo.Id(), dtu.SavePath)
+	fmt.Printf("[%s] File integrity check passed: %s\n", dtu.taskInfo.Id(), dtu.SavePath)
 	return true
 }
 
@@ -409,10 +409,10 @@ func (dtu *DownloadTaskUnit) OnRetry(lastRunResult *taskframework.TaskUnitRunRes
 	// 输出错误信息
 	if lastRunResult.Err == nil {
 		// result中不包含Err, 忽略输出
-		fmt.Printf("[%s] %s, 重试 %d/%d\n", dtu.taskInfo.Id(), lastRunResult.ResultMessage, dtu.taskInfo.Retry(), dtu.taskInfo.MaxRetry())
+		fmt.Printf("[%s] %s, retry %d/%d\n", dtu.taskInfo.Id(), lastRunResult.ResultMessage, dtu.taskInfo.Retry(), dtu.taskInfo.MaxRetry())
 		return
 	}
-	fmt.Printf("[%s] %s, %s, 重试 %d/%d\n", dtu.taskInfo.Id(), lastRunResult.ResultMessage, lastRunResult.Err, dtu.taskInfo.Retry(), dtu.taskInfo.MaxRetry())
+	fmt.Printf("[%s] %s, %s, retry %d/%d\n", dtu.taskInfo.Id(), lastRunResult.ResultMessage, lastRunResult.Err, dtu.taskInfo.Retry(), dtu.taskInfo.MaxRetry())
 }
 
 func (dtu *DownloadTaskUnit) OnSuccess(lastRunResult *taskframework.TaskUnitRunResult) {
@@ -446,7 +446,7 @@ func (dtu *DownloadTaskUnit) Run() (result *taskframework.TaskUnitRunResult) {
 		dtu.FileInfo, err = dtu.PCS.FilesDirectoriesMeta(dtu.PcsPath)
 		if err != nil {
 			// 如果不是未登录或文件不存在, 则不重试
-			result.ResultMessage = "获取下载路径信息错误"
+			result.ResultMessage = "failed to get download path info"
 			result.Err = err
 			dtu.handleError(result)
 			return
@@ -498,17 +498,17 @@ func (dtu *DownloadTaskUnit) Run() (result *taskframework.TaskUnitRunResult) {
 		return
 	}
 
-	fmt.Printf("[%s] 准备下载: %s\n", dtu.taskInfo.Id(), dtu.PcsPath)
+	fmt.Printf("[%s] Preparing download: %s\n", dtu.taskInfo.Id(), dtu.PcsPath)
 
 	if !dtu.Cfg.IsTest && !dtu.IsOverwrite && FileExist(dtu.SavePath) {
-		fmt.Printf("[%s] 文件已经存在: %s, 跳过...\n", dtu.taskInfo.Id(), dtu.SavePath)
+		fmt.Printf("[%s] File already exists: %s, skipped...\n", dtu.taskInfo.Id(), dtu.SavePath)
 		result.Succeed = true // 执行成功
 		return
 	}
 
 	if !dtu.Cfg.IsTest {
 		// 不是测试下载, 输出下载路径
-		fmt.Printf("[%s] 将会下载到路径: %s\n\n", dtu.taskInfo.Id(), dtu.SavePath)
+		fmt.Printf("[%s] Will download to: %s\n\n", dtu.taskInfo.Id(), dtu.SavePath)
 	}
 
 	var ok bool

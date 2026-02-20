@@ -128,7 +128,7 @@ func (bl *BaiduUserList) String() string {
 
 	tb := pcstable.NewTable(builder)
 	tb.SetColumnAlignment([]int{tablewriter.ALIGN_DEFAULT, tablewriter.ALIGN_RIGHT, tablewriter.ALIGN_CENTER, tablewriter.ALIGN_CENTER, tablewriter.ALIGN_CENTER})
-	tb.SetHeader([]string{"#", "uid", "用户名", "性别", "age"})
+	tb.SetHeader([]string{"#", "uid", "Username", "Gender", "Age"})
 
 	for k, baiduInfo := range *bl {
 		tb.Append([]string{strconv.Itoa(k), strconv.FormatUint(baiduInfo.UID, 10), baiduInfo.Name, baiduInfo.Sex, fmt.Sprint(baiduInfo.Age)})

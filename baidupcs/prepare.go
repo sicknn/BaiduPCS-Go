@@ -143,7 +143,7 @@ func (pcs *BaiduPCS) PrepareFilesDirectoriesBatchMeta(paths ...string) (dataRead
 	pcs.lazyInit()
 	sendData, err := (&PathsListJSON{}).JSON(paths...)
 	if err != nil {
-		panic(OperationFilesDirectoriesMeta + ", json 数据构造失败, " + err.Error())
+		panic(OperationFilesDirectoriesMeta + ", failed to build json data, " + err.Error())
 	}
 
 	pcsURL := pcs.generatePCSURL("file", "meta")
@@ -236,7 +236,7 @@ func (pcs *BaiduPCS) PrepareRemove(paths ...string) (dataReadCloser io.ReadClose
 	pcs.lazyInit()
 	sendData, err := (&PathsListJSON{}).JSON(paths...)
 	if err != nil {
-		panic(OperationMove + ", json 数据构造失败, " + err.Error())
+		panic(OperationMove + ", failed to build json data, " + err.Error())
 	}
 
 	pcsURL := pcs.generatePCSURL("file", "delete")

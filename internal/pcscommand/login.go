@@ -16,12 +16,12 @@ import (
 func handleVerifyImg(imgURL string) (savePath string, err error) {
 	imgContents, err := requester.Fetch("GET", imgURL, nil, nil)
 	if err != nil {
-		return "", fmt.Errorf("获取验证码失败, 错误: %s", err)
+		return "", fmt.Errorf("failed to fetch captcha, error: %s", err)
 	}
 
 	_, err = png.Decode(bytes.NewReader(imgContents))
 	if err != nil {
-		return "", fmt.Errorf("验证码解析错误: %s", err)
+		return "", fmt.Errorf("failed to decode captcha image: %s", err)
 	}
 
 	savePath = pcscaptcha.CaptchaPath()
@@ -37,7 +37,7 @@ func RunLogin(username, password string) (bduss, ptoken, stoken string, cookies 
 	bc := baidulogin.NewBaiduClinet()
 
 	if username == "" {
-		username, err = line.State.Prompt("请输入百度用户名(手机号/邮箱/用户名), 回车键提交 > ")
+		username, err = line.State.Prompt("Enter your Baidu username (phone/email/username), then press Enter > ")
 		if err != nil {
 			return
 		}
@@ -45,7 +45,7 @@ func RunLogin(username, password string) (bduss, ptoken, stoken string, cookies 
 
 	if password == "" {
 		// liner 的 PasswordPrompt 不安全, 拆行之后密码就会显示出来了
-		fmt.Printf("请输入密码(输入的密码无回显, 确认输入完成, 回车提交即可) > ")
+		fmt.Printf("Enter password (input is hidden), then press Enter > ")
 		password, err = line.State.PasswordPrompt("")
 		if err != nil {
 			return
@@ -67,14 +67,14 @@ for_1:
 		case "0": // 登录成功, 退出循环
 			return lj.Data.BDUSS, lj.Data.PToken, lj.Data.SToken, lj.Data.CookieString, nil
 		case "400023", "400101": // 需要验证手机或邮箱
-			fmt.Printf("\n需要验证手机或邮箱才能登录\n选择一种验证方式\n")
-			fmt.Printf("1: 手机: %s\n", lj.Data.Phone)
-			fmt.Printf("2: 邮箱: %s\n", lj.Data.Email)
+			fmt.Printf("\nPhone or email verification is required to log in\nChoose a verification method\n")
+			fmt.Printf("1: Phone: %s\n", lj.Data.Phone)
+			fmt.Printf("2: Email: %s\n", lj.Data.Email)
 			fmt.Printf("\n")
 
 			var verifyType string
 			for et := 0; et < 3; et++ {
-				verifyType, err = line.State.Prompt("请输入验证方式 (1 或 2) > ")
+				verifyType, err = line.State.Prompt("Enter verification method (1 or 2) > ")
 				if err != nil {
 					return
 				}
@@ -85,13 +85,13 @@ for_1:
 				case "2":
 					verifyType = "email"
 				default:
-					fmt.Printf("[%d/3] 验证方式不合法\n", et+1)
+					fmt.Printf("[%d/3] Invalid verification method\n", et+1)
 					continue
 				}
 				break
 			}
 			if verifyType != "mobile" && verifyType != "email" {
-				err = fmt.Errorf("验证方式不合法")
+				err = fmt.Errorf("invalid verification method")
 				return
 			}
 			msg := ""
@@ -100,12 +100,12 @@ for_1:
 			} else {
 				msg = bc.SendCodeToUser2(verifyType, lj.Data.Token)
 			}
-			fmt.Printf("消息: %s\n\n", msg)
-			if strings.Contains(msg, "系统出错") {
+			fmt.Printf("Message: %s\n\n", msg)
+			if strings.Contains(msg, "System error") || strings.Contains(msg, "系统出错") {
 				return
 			}
 			for et := 0; et < 3; et++ {
-				vcode, err = line.State.Prompt("请输入接收到的验证码 > ")
+				vcode, err = line.State.Prompt("Enter the verification code you received > ")
 				if err != nil {
 					return
 				}
@@ -118,7 +118,7 @@ for_1:
 					nlj = bc.VerifyCode2(verifyType, lj.Data.Token, vcode, lj.Data.U)
 				}
 				if nlj.ErrInfo.No != "0" {
-					fmt.Printf("[%d/3] 错误消息: %s\n\n", et+1, nlj.ErrInfo.Msg)
+					fmt.Printf("[%d/3] Error message: %s\n\n", et+1, nlj.ErrInfo.Msg)
 					if nlj.ErrInfo.No == "-2" { // 需要重发验证码
 						return
 					}
@@ -136,7 +136,7 @@ for_1:
 			fmt.Printf("\n%s\n", lj.ErrInfo.Msg)
 			vcodestr = lj.Data.CodeString
 			if vcodestr == "" {
-				err = fmt.Errorf("未找到codeString")
+				err = fmt.Errorf("codeString not found")
 				return
 			}
 
@@ -150,19 +150,19 @@ for_1:
 			if err != nil {
 				fmt.Println(err)
 			} else {
-				fmt.Printf("打开以下路径, 以查看验证码\n%s\n\n", savePath)
+				fmt.Printf("Open the path below to view the captcha\n%s\n\n", savePath)
 			}
 
-			fmt.Printf("或者打开以下的网址, 以查看验证码\n")
+			fmt.Printf("Or open the URL below to view the captcha\n")
 			fmt.Printf("%s\n\n", verifyImgURL)
 
-			vcode_raw, err = line.State.Prompt("请输入验证码 > ")
+			vcode_raw, err = line.State.Prompt("Enter captcha code > ")
 			if err != nil {
 				return
 			}
 			continue
 		default:
-			err = fmt.Errorf("错误代码: %s, 消息: %s", lj.ErrInfo.No, lj.ErrInfo.Msg)
+			err = fmt.Errorf("error code: %s, message: %s", lj.ErrInfo.No, lj.ErrInfo.Msg)
 			return
 		}
 	}

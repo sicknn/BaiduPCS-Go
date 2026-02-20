@@ -17,92 +17,92 @@ import (
 
 const (
 	// OperationGetUK 获取UK
-	OperationGetUK = "获取UK"
+	OperationGetUK = "Get UK"
 	// OperationGetBDSToken
-	OperationGetBDSToken = "获取bdstoken"
+	OperationGetBDSToken = "Get bdstoken"
 	// OperationGetCursorDiff
-	OperationGetCursorDiff = "获取cursor后文件列表diff信息"
+	OperationGetCursorDiff = "Get file-list diff after cursor"
 	// OperationGetPCSServer 获取可用的psc服务器
-	OperationGetPCSServer = "获取可用的PCS服务器列表"
+	OperationGetPCSServer = "Get available PCS server list"
 	// OperationQuotaInfo 获取当前用户空间配额信息
-	OperationQuotaInfo = "获取当前用户空间配额信息"
+	OperationQuotaInfo = "Get current user quota"
 	// OperationFilesDirectoriesMeta 获取文件/目录的元信息
-	OperationFilesDirectoriesMeta = "获取文件/目录的元信息"
+	OperationFilesDirectoriesMeta = "Get file/directory metadata"
 	// OperationFilesDirectoriesList 获取目录下的文件列表
-	OperationFilesDirectoriesList = "获取目录下的文件列表"
+	OperationFilesDirectoriesList = "List files in directory"
 	// OperationSearch 搜索
-	OperationSearch = "搜索"
+	OperationSearch = "Search"
 	// OperationRemove 删除文件/目录
-	OperationRemove = "删除文件/目录"
+	OperationRemove = "Delete file/directory"
 	// OperationMkdir 创建目录
-	OperationMkdir = "创建目录"
+	OperationMkdir = "Create directory"
 	// OperationRename 重命名文件/目录
-	OperationRename = "重命名文件/目录"
+	OperationRename = "Rename file/directory"
 	// OperationCopy 拷贝文件/目录
-	OperationCopy = "拷贝文件/目录"
+	OperationCopy = "Copy file/directory"
 	// OperationMove 移动文件/目录
-	OperationMove = "移动文件/目录"
+	OperationMove = "Move file/directory"
 	// OperationRapidUpload 秒传文件
-	OperationRapidUpload = "秒传文件"
+	OperationRapidUpload = "Rapid upload file"
 	// OperationUpload 上传单个文件
-	OperationUpload = "上传单个文件"
+	OperationUpload = "Upload single file"
 	// OperationUploadTmpFile 分片上传—文件分片及上传
-	OperationUploadTmpFile = "分片上传—文件分片及上传"
+	OperationUploadTmpFile = "Chunk upload - upload chunk"
 	// OperationUploadCreateSuperFile 分片上传—合并分片文件
-	OperationUploadCreateSuperFile = "分片上传—合并分片文件"
+	OperationUploadCreateSuperFile = "Chunk upload - merge chunks"
 	// OperationUploadPrecreate 分片上传—Precreate
-	OperationUploadPrecreate = "分片上传—Precreate"
+	OperationUploadPrecreate = "Chunk upload - precreate"
 	// OperationUploadSuperfile2 分片上传—Superfile2
-	OperationUploadSuperfile2 = "分片上传—Superfile2"
+	OperationUploadSuperfile2 = "Chunk upload - superfile2"
 	// OperationDownloadFile 下载单个文件
-	OperationDownloadFile = "下载单个文件"
+	OperationDownloadFile = "Download single file"
 	// OperationDownloadStreamFile 下载流式文件
-	OperationDownloadStreamFile = "下载流式文件"
+	OperationDownloadStreamFile = "Download stream file"
 	// OperationLocateDownload 获取下载链接
-	OperationLocateDownload = "获取下载链接"
+	OperationLocateDownload = "Get download link"
 	// OperationLocatePanAPIDownload 从百度网盘首页获取下载链接
-	OperationLocatePanAPIDownload = "获取下载链接2"
+	OperationLocatePanAPIDownload = "Get download link (Pan API)"
 	// OperationCloudDlAddTask 添加离线下载任务
-	OperationCloudDlAddTask = "添加离线下载任务"
+	OperationCloudDlAddTask = "Add offline download task"
 	// OperationCloudDlQueryTask 精确查询离线下载任务
-	OperationCloudDlQueryTask = "精确查询离线下载任务"
+	OperationCloudDlQueryTask = "Query offline download tasks by ID"
 	// OperationCloudDlListTask 查询离线下载任务列表
-	OperationCloudDlListTask = "查询离线下载任务列表"
+	OperationCloudDlListTask = "List offline download tasks"
 	// OperationCloudDlCancelTask 取消离线下载任务
-	OperationCloudDlCancelTask = "取消离线下载任务"
+	OperationCloudDlCancelTask = "Cancel offline download task"
 	// OperationCloudDlDeleteTask 删除离线下载任务
-	OperationCloudDlDeleteTask = "删除离线下载任务"
+	OperationCloudDlDeleteTask = "Delete offline download task"
 	// OperationCloudDlClearTask 清空离线下载任务记录
-	OperationCloudDlClearTask = "清空离线下载任务记录"
+	OperationCloudDlClearTask = "Clear offline download task records"
 	// OperationShareSet 创建分享链接
-	OperationShareSet = "创建分享链接"
+	OperationShareSet = "Create share link"
 	// OperationShareCancel 取消分享
-	OperationShareCancel = "取消分享"
+	OperationShareCancel = "Cancel share"
 	// OperationShareList 列出分享列表
-	OperationShareList = "列出分享列表"
+	OperationShareList = "List shares"
 	// OperationShareSURLInfo 获取分享详细信息
-	OperationShareSURLInfo = "获取分享详细信息"
+	OperationShareSURLInfo = "Get share details"
 	// OperationShareFileSavetoLocal 分享链接转存到网盘
-	OperationShareFileSavetoLocal = "分享链接转存到网盘"
+	OperationShareFileSavetoLocal = "Save shared files to cloud"
 	// OperationRapidLinkSavetoLocal 秒传链接转存到网盘
-	OperationRapidLinkSavetoLocal = "秒传链接转存到网盘"
+	OperationRapidLinkSavetoLocal = "Save rapid link to cloud"
 	// OperationRecycleList 列出回收站文件列表
-	OperationRecycleList = "列出回收站文件列表"
+	OperationRecycleList = "List recycle bin files"
 	// OperationRecycleRestore 还原回收站文件或目录
-	OperationRecycleRestore = "还原回收站文件或目录"
+	OperationRecycleRestore = "Restore recycle bin file/directory"
 	// OperationRecycleDelete 删除回收站文件或目录
-	OperationRecycleDelete = "删除回收站文件或目录"
+	OperationRecycleDelete = "Delete recycle bin file/directory"
 	// OperationRecycleClear 清空回收站
-	OperationRecycleClear = "清空回收站"
+	OperationRecycleClear = "Clear recycle bin"
 
 	// OperationExportFileInfo 导出文件信息
-	OperationExportFileInfo = "导出文件信息"
+	OperationExportFileInfo = "Export file info"
 	// OperationGetRapidUploadInfo 获取文件秒传信息
-	OperationGetRapidUploadInfo = "获取文件秒传信息"
+	OperationGetRapidUploadInfo = "Get rapid upload file info"
 	// OperationFixMD5 修复文件md5
-	OperationFixMD5 = "修复文件md5"
+	OperationFixMD5 = "Fix file md5"
 	// OperationMatchPathByShellPattern 通配符匹配文件路径
-	OperationMatchPathByShellPattern = "通配符匹配文件路径"
+	OperationMatchPathByShellPattern = "Match file path by wildcard"
 
 	// PCSBaiduCom pcs api地址
 	PCSBaiduCom = "pcs.baidu.com"

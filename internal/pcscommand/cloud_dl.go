@@ -21,11 +21,11 @@ func RunCloudDlAddTask(sourceURLs []string, savePath string) {
 	for k := range sourceURLs {
 		taskid, err = pcs.CloudDlAddTask(sourceURLs[k], savePath+baidupcs.PathSeparator)
 		if err != nil {
-			fmt.Printf("[%d] %s, 地址: %s\n", k+1, err, sourceURLs[k])
+			fmt.Printf("[%d] %s, URL: %s\n", k+1, err, sourceURLs[k])
 			continue
 		}
 
-		fmt.Printf("[%d] 添加离线任务成功, 任务ID(task_id): %d, 源地址: %s, 保存路径: %s\n", k+1, taskid, sourceURLs[k], savePath)
+		fmt.Printf("[%d] Offline task added, task ID: %d, source URL: %s, save path: %s\n", k+1, taskid, sourceURLs[k], savePath)
 	}
 }
 
@@ -60,7 +60,7 @@ func RunCloudDlCancelTask(taskIDs []int64) {
 			continue
 		}
 
-		fmt.Printf("[%d] 取消成功\n", id)
+		fmt.Printf("[%d] Cancelled successfully\n", id)
 	}
 }
 
@@ -73,7 +73,7 @@ func RunCloudDlDeleteTask(taskIDs []int64) {
 			continue
 		}
 
-		fmt.Printf("[%d] 删除成功\n", id)
+		fmt.Printf("[%d] Deleted successfully\n", id)
 	}
 }
 
@@ -85,6 +85,6 @@ func RunCloudDlClearTask() {
 		return
 	}
 
-	fmt.Printf("%s成功, 共清除 %d 条记录\n", baidupcs.OperationCloudDlClearTask, total)
+	fmt.Printf("%s succeeded, cleared %d records\n", baidupcs.OperationCloudDlClearTask, total)
 	return
 }

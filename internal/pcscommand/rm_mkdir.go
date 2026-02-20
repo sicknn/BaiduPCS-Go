@@ -17,7 +17,7 @@ func RunRemove(paths ...string) {
 
 	pnt := func() {
 		tb := pcstable.NewTable(os.Stdout)
-		tb.SetHeader([]string{"#", "文件/目录"})
+		tb.SetHeader([]string{"#", "File/Directory"})
 		for k := range paths {
 			tb.Append([]string{strconv.Itoa(k), paths[k]})
 		}
@@ -27,12 +27,12 @@ func RunRemove(paths ...string) {
 	err = GetBaiduPCS().Remove(paths...)
 	if err != nil {
 		fmt.Println(err)
-		fmt.Println("操作失败, 以下文件/目录删除失败: ")
+		fmt.Println("Operation failed, the following files/directories failed to delete:")
 		pnt()
 		return
 	}
 
-	fmt.Println("操作成功, 以下文件/目录已删除, 可在网盘文件回收站找回: ")
+	fmt.Println("Operation succeeded, the following files/directories were deleted (recoverable from recycle bin):")
 	pnt()
 }
 
@@ -41,9 +41,9 @@ func RunMkdir(path string) {
 	activeUser := GetActiveUser()
 	err := GetBaiduPCS().Mkdir(activeUser.PathJoin(path))
 	if err != nil {
-		fmt.Printf("创建目录 %s 失败, %s\n", path, err)
+		fmt.Printf("Failed to create directory %s, %s\n", path, err)
 		return
 	}
 
-	fmt.Println("创建目录成功:", path)
+	fmt.Println("Directory created successfully:", path)
 }

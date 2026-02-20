@@ -35,40 +35,40 @@ import (
 )
 
 const (
-	// NameShortDisplayNum 文件名缩略显示长度
+	// NameShortDisplayNum 
 	NameShortDisplayNum = 16
 
 	cryptoDescription = `
-	可用的方法 <method>:
+	Available methods <method>:
 		aes-128-ctr, aes-192-ctr, aes-256-ctr,
 		aes-128-cfb, aes-192-cfb, aes-256-cfb,
 		aes-128-ofb, aes-192-ofb, aes-256-ofb.
 
-	密钥 <key>:
-		aes-128 对应key长度为16, aes-192 对应key长度为24, aes-256 对应key长度为32,
-		如果key长度不符合, 则自动修剪key, 舍弃超出长度的部分, 长度不足的部分用'\0'填充.
+	Key <key>:
+		aes-128 requires a 16-byte key, aes-192 requires 24 bytes, aes-256 requires 32 bytes.
+		If key length does not match, extra bytes are trimmed and missing bytes are padded with '\0'.
 
 	GZIP <disable-gzip>:
-		在文件加密之前, 启用GZIP压缩文件; 文件解密之后启用GZIP解压缩文件, 默认启用,
-		如果不启用, 则无法检测文件是否解密成功, 解密文件时会保留源文件, 避免解密失败造成文件数据丢失.`
+		Enable GZIP before encryption and after decryption (enabled by default).
+		Disabling GZIP removes integrity hints, so source files are kept on decrypt to avoid data loss.`
 )
 
 var (
-	// Version 版本号
+	// Version 
 	Version = "v4.0.0-stable"
 
 	historyFilePath = filepath.Join(pcsconfig.GetConfigDir(), "pcs_command_history.txt")
 	reloadFn        = func(c *cli.Context) error {
 		err := pcsconfig.Config.Reload()
 		if err != nil {
-			fmt.Printf("重载配置错误: %s\n", err)
+			fmt.Printf("Failed to reload config: %s\n", err)
 		}
 		return nil
 	}
 	saveFunc = func(c *cli.Context) error {
 		err := pcsconfig.Config.Save()
 		if err != nil {
-			fmt.Printf("保存配置错误: %s\n", err)
+			fmt.Printf("Failed to save config: %s\n", err)
 		}
 		return nil
 	}
@@ -98,39 +98,31 @@ func main() {
 	app.Version = Version
 	app.Author = "qjfoidnh/BaiduPCS-Go: https://github.com/qjfoidnh/BaiduPCS-Go"
 	app.Copyright = "(c) 2016-2020 iikira."
-	app.Usage = "百度网盘客户端 for " + runtime.GOOS + "/" + runtime.GOARCH
-	app.Description = `BaiduPCS-Go 使用Go语言编写的百度网盘命令行客户端, 为操作百度网盘, 提供实用功能.
-	具体功能, 参见 COMMANDS 列表
+	app.Usage = "Baidu Netdisk CLI for " + runtime.GOOS + "/" + runtime.GOARCH
+	app.Description = `BaiduPCS-Go is a command-line Baidu Netdisk client written in Go.
+Use COMMANDS below to manage files, download/upload data, and automate netdisk tasks.
 
-	特色:
-		网盘内列出文件和目录, 支持通配符匹配路径;
-		下载网盘内文件, 支持网盘内目录 (文件夹) 下载, 支持多个文件或目录下载, 支持断点续传和高并发高速下载.
-
-	---------------------------------------------------
-	前往 https://github.com/qjfoidnh/BaiduPCS-Go 以获取更多帮助信息!
-	前往 https://github.com/qjfoidnh/BaiduPCS-Go/releases 以获取程序更新信息!
-	---------------------------------------------------
-
-	交流反馈:
-		提交Issue: https://github.com/qjfoidnh/BaiduPCS-Go/issues
-		邮箱: qjfoidnh@126.com`
+Project: https://github.com/qjfoidnh/BaiduPCS-Go
+Releases: https://github.com/qjfoidnh/BaiduPCS-Go/releases
+Issues: https://github.com/qjfoidnh/BaiduPCS-Go/issues
+Email: qjfoidnh@126.com`
 
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
 			Name:        "verbose",
-			Usage:       "启用调试",
+			Usage:       "Enable debug logging",
 			EnvVar:      pcsverbose.EnvVerbose,
 			Destination: &pcsverbose.IsVerbose,
 		},
 	}
 	app.Action = func(c *cli.Context) {
 		if c.NArg() != 0 {
-			fmt.Printf("未找到命令: %s\n运行命令 %s help 获取帮助\n", c.Args().Get(0), app.Name)
+			fmt.Printf("Command not found: %s\nRun %s help for usage\n", c.Args().Get(0), app.Name)
 			return
 		}
 
 		isCli = true
-		pcsverbose.Verbosef("VERBOSE: 这是一条调试信息\n\n")
+		pcsverbose.Verbosef("VERBOSE: this is a debug message\n\n")
 
 		var (
 			line = pcsliner.NewLiner()
@@ -139,7 +131,7 @@ func main() {
 
 		line.History, err = pcsliner.NewLineHistory(historyFilePath)
 		if err != nil {
-			fmt.Printf("警告: 读取历史命令文件错误, %s\n", err)
+			fmt.Printf("Warning: failed to read command history file, %s\n", err)
 		}
 
 		line.ReadHistory()
@@ -148,7 +140,7 @@ func main() {
 			line.Close()
 		}()
 
-		// tab 自动补全命令
+		// tab 
 		line.State.SetCompleter(func(line string) (s []string) {
 			var (
 				lineArgs                   = args.Parse(line)
@@ -203,7 +195,7 @@ func main() {
 
 			if !closed {
 				targetPath = lineArgs[numArgs-1]
-				escaper.EscapeStringsByRuneFunc(lineArgs[:numArgs-1], runeFunc) // 转义
+				escaper.EscapeStringsByRuneFunc(lineArgs[:numArgs-1], runeFunc) // 
 			} else {
 				escaper.EscapeStringsByRuneFunc(lineArgs, runeFunc)
 			}
@@ -247,7 +239,7 @@ func main() {
 					appendLine string
 				)
 
-				// 已经有的情况
+				// 
 				if !closed {
 					if !strings.HasPrefix(file.Path, path.Clean(path.Join(targetDir, path.Base(targetPath)))) {
 						if path.Base(targetDir) == path.Base(targetPath) {
@@ -261,7 +253,7 @@ func main() {
 					appendLine = strings.Join(append(lineArgs[:numArgs-1], escaper.EscapeByRuneFunc(path.Clean(path.Join(path.Dir(targetPath), file.Filename)), pcsRuneFunc)), " ")
 					goto handle
 				}
-				// 没有的情况
+				// 
 				appendLine = strings.Join(append(lineArgs, escaper.EscapeByRuneFunc(file.Filename, pcsRuneFunc)), " ")
 				goto handle
 
@@ -277,9 +269,9 @@ func main() {
 			return
 		})
 
-		fmt.Printf("提示: 方向键上下可切换历史命令.\n")
-		fmt.Printf("提示: Ctrl + A / E 跳转命令 首 / 尾.\n")
-		fmt.Printf("提示: 输入 help 获取帮助.\n")
+		fmt.Printf("Tip: Use Up/Down arrows to switch command history.\n")
+		fmt.Printf("Tip: Use Ctrl+A/E to move to command start/end.\n")
+		fmt.Printf("Tip: Type help for usage.\n")
 
 		for {
 			var (
@@ -288,8 +280,8 @@ func main() {
 			)
 
 			if activeUser.Name != "" {
-				// 格式: BaiduPCS-Go:<工作目录> <百度ID>$
-				// 工作目录太长时, 会自动缩略
+				// : BaiduPCS-Go:<> <ID>$
+				// , 
 				prompt = app.Name + ":" + converter.ShortDisplay(path.Base(activeUser.Workdir), NameShortDisplayNum) + " " + activeUser.Name + "$ "
 			} else {
 				// BaiduPCS-Go >
@@ -317,8 +309,8 @@ func main() {
 			s := []string{os.Args[0]}
 			s = append(s, cmdArgs...)
 
-			// 恢复原始终端状态
-			// 防止运行命令时程序被结束, 终端出现异常
+			// 
+			// , 
 			line.Pause()
 			c.App.Run(s)
 			line.Resume()
@@ -328,8 +320,8 @@ func main() {
 	app.Commands = []cli.Command{
 		{
 			Name:     "run",
-			Usage:    "执行系统命令",
-			Category: "其他",
+			Usage:    "Run system command",
+			Category: "Other",
 			Action: func(c *cli.Context) error {
 				if c.NArg() == 0 {
 					cli.ShowCommandHelp(c, c.Command.Name)
@@ -351,12 +343,9 @@ func main() {
 		},
 		{
 			Name:  "env",
-			Usage: "显示程序环境变量",
-			Description: `
-	BAIDUPCS_GO_CONFIG_DIR: 配置文件路径,
-	BAIDUPCS_GO_VERBOSE: 是否启用调试.
-`,
-			Category: "其他",
+			Usage: "Show environment variables",
+			Description: "See command usage and options for details.",
+			Category: "Other",
 			Action: func(c *cli.Context) error {
 				envStr := "%s=\"%s\"\n"
 				envVar, ok := os.LookupEnv(pcsverbose.EnvVerbose)
@@ -378,8 +367,8 @@ func main() {
 		},
 		{
 			Name:     "update",
-			Usage:    "检测程序更新",
-			Category: "其他",
+			Usage:    "Check for updates",
+			Category: "Other",
 			Action: func(c *cli.Context) error {
 				if c.IsSet("y") {
 					if !c.Bool("y") {
@@ -392,30 +381,15 @@ func main() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "y",
-					Usage: "确认更新",
+					Usage: "Confirm update",
 				},
 			},
 		},
 		{
 			Name:  "login",
-			Usage: "登录百度账号",
-			Description: `
-	示例:
-		BaiduPCS-Go login
-		BaiduPCS-Go login -username=liuhua
-		BaiduPCS-Go login -bduss=123456789 -stoken=atahsrweoog
-		BaiduPCS-Go login -cookies="BDUSS=xxxxx; BAIDUID=yyyyyy; STOKEN=zzzzz; ...."
-
-	常规登录:
-		按提示一步一步来即可.
-
-	百度BDUSS获取方法:
-		百度搜索: 获取百度BDUSS
-		
-	百度Cookies获取办法:
-	以Chrome为例，登录到自己的百度网盘主页，F12，然后切换到Network标签，刷新页面，Network标签下会刷出一大堆东西
-	找到第一条，点击，看到右侧出现的详情，往下翻到Cookies: xxxx; xxxxx; xxx...这样的字段，从冒号后（没有空格）一直复制到字段末尾`,
-			Category: "百度帐号",
+			Usage: "Login Baidu account",
+			Description: "See command usage and options for details.",
+			Category: "Baidu Account",
 			Before:   reloadFn,
 			After:    saveFunc,
 			Action: func(c *cli.Context) error {
@@ -444,48 +418,41 @@ func main() {
 					return nil
 				}
 
-				fmt.Println("百度帐号登录成功:", baidu.Name)
+				fmt.Println("Baidu account login succeeded:", baidu.Name)
 				return nil
 			},
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "username",
-					Usage: "登录百度帐号的用户名(手机号/邮箱/用户名)",
+					Usage: "Baidu account username (phone/email/username)",
 				},
 				cli.StringFlag{
 					Name:  "password",
-					Usage: "登录百度帐号的用户名的密码",
+					Usage: "Password for Baidu account username",
 				},
 				cli.StringFlag{
 					Name:  "bduss",
-					Usage: "使用百度 BDUSS 来登录百度帐号",
+					Usage: "Use Baidu BDUSS to login",
 				},
 				cli.StringFlag{
 					Name:  "ptoken",
-					Usage: "百度 PTOKEN, 配合 -bduss 参数使用 (可选)",
+					Usage: "Baidu PTOKEN used with -bduss (optional)",
 				},
 				cli.StringFlag{
 					Name:  "stoken",
-					Usage: "百度 STOKEN, 配合 -bduss 参数使用 (可选, 欲使用转存功能则必选)",
+					Usage: "Baidu STOKEN used with -bduss (optional, required for transfer)",
 				},
 				cli.StringFlag{
 					Name:  "cookies",
-					Usage: "使用百度 Cookies 来登录百度账号",
+					Usage: "Use Baidu cookies to login",
 				},
 			},
 		},
 		{
 			Name:  "su",
-			Usage: "切换百度帐号",
-			Description: `
-	切换已登录的百度帐号:
-	如果运行该条命令没有提供参数, 程序将会列出所有的百度帐号, 供选择切换.
-
-	示例:
-	BaiduPCS-Go su
-	BaiduPCS-Go su <uid or name>
-`,
-			Category: "百度帐号",
+			Usage: "Switch Baidu account",
+			Description: "See command usage and options for details.",
+			Category: "Baidu Account",
 			Before:   reloadFn,
 			After:    saveFunc,
 			Action: func(c *cli.Context) error {
@@ -497,7 +464,7 @@ func main() {
 				numLogins := pcsconfig.Config.NumLogins()
 
 				if numLogins == 0 {
-					fmt.Printf("未设置任何百度帐号, 不能切换\n")
+					fmt.Printf("No Baidu account configured, cannot switch\n")
 					return nil
 				}
 
@@ -507,15 +474,15 @@ func main() {
 				)
 
 				if c.NArg() == 1 {
-					// 直接切换
+					// 
 					uid, _ = strconv.ParseUint(inputData, 10, 64)
 				} else if c.NArg() == 0 {
-					// 输出所有帐号供选择切换
+					// 
 					cli.HandleAction(app.Command("loglist").Action, c)
 
-					// 提示输入 index
+					//  index
 					var index string
-					fmt.Printf("输入要切换帐号的 # 值 > ")
+					fmt.Printf("Enter # index to switch account > ")
 					_, err := fmt.Scanln(&index)
 					if err != nil {
 						return nil
@@ -524,7 +491,7 @@ func main() {
 					if n, err := strconv.Atoi(index); err == nil && n >= 0 && n < numLogins {
 						uid = pcsconfig.Config.BaiduUserList[n].UID
 					} else {
-						fmt.Printf("切换用户失败, 请检查 # 值是否正确\n")
+						fmt.Printf("Failed to switch user, please check the # index\n")
 						return nil
 					}
 				} else {
@@ -539,25 +506,25 @@ func main() {
 						UID: uid,
 					})
 					if err != nil {
-						fmt.Printf("切换用户失败, %s\n", err)
+						fmt.Printf("Failed to switch user, %s\n", err)
 						return nil
 					}
 				}
 
-				fmt.Printf("切换用户: %s\n", switchedUser.Name)
+				fmt.Printf("Switched user: %s\n", switchedUser.Name)
 				return nil
 			},
 		},
 		{
 			Name:        "logout",
-			Usage:       "退出百度帐号",
-			Description: "退出当前登录的百度帐号",
-			Category:    "百度帐号",
+			Usage:       "Logout Baidu account",
+			Description: "Log out current Baidu account",
+			Category:    "Baidu Account",
 			Before:      reloadFn,
 			After:       saveFunc,
 			Action: func(c *cli.Context) error {
 				if pcsconfig.Config.NumLogins() == 0 {
-					fmt.Println("未设置任何百度帐号, 不能退出")
+					fmt.Println("No Baidu account configured, cannot logout")
 					return nil
 				}
 
@@ -567,7 +534,7 @@ func main() {
 				)
 
 				if !c.Bool("y") {
-					fmt.Printf("确认退出百度帐号: %s ? (y/n) > ", activeUser.Name)
+					fmt.Printf("Confirm logout account: %s ? (y/n) > ", activeUser.Name)
 					_, err := fmt.Scanln(&confirm)
 					if err != nil || (confirm != "y" && confirm != "Y") {
 						return err
@@ -578,24 +545,24 @@ func main() {
 					UID: activeUser.UID,
 				})
 				if err != nil {
-					fmt.Printf("退出用户 %s, 失败, 错误: %s\n", activeUser.Name, err)
+					fmt.Printf("Failed to logout user %s, error: %s\n", activeUser.Name, err)
 				}
 
-				fmt.Printf("退出用户成功, %s\n", deletedUser.Name)
+				fmt.Printf("Logout succeeded, %s\n", deletedUser.Name)
 				return nil
 			},
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "y",
-					Usage: "确认退出帐号",
+					Usage: "Confirm account logout",
 				},
 			},
 		},
 		{
 			Name:        "loglist",
-			Usage:       "列出帐号列表",
-			Description: "列出所有已登录的百度帐号",
-			Category:    "百度帐号",
+			Usage:       "List account list",
+			Description: "List all logged-in Baidu accounts",
+			Category:    "Baidu Account",
 			Before:      reloadFn,
 			Action: func(c *cli.Context) error {
 				fmt.Println(pcsconfig.Config.BaiduUserList.String())
@@ -604,23 +571,15 @@ func main() {
 		},
 		{
 			Name:  "setastoken",
-			Usage: "设定当前账号的accessToken",
-			Description: `
-	设定当前登录帐号的accessToken:
-	若不使用秒传链接转存, 可不设定; accessToken申请及获取教程:
-	https://github.com/qjfoidnh/BaiduPCS-Go/wiki/accessToken%E8%8E%B7%E5%8F%96%E6%95%99%E7%A8%8B
-	注意accessToken的有效期为一个月, 过期后请按教程指导更新token
-
-	示例:
-	BaiduPCS-Go setastoken 156.182v9052tgf1006c89891bsfb2401974.YmKOAwBD9yGaG2s4p5NNkX4CXeIbJxx4hAxotfS.PyuHEs
-`,
-			Category: "百度帐号",
+			Usage: "Set accessToken for current account",
+			Description: "See command usage and options for details.",
+			Category: "Baidu Account",
 			Before:   reloadFn,
 			After:    saveFunc,
 			Action: func(c *cli.Context) error {
 				activeUser := pcsconfig.Config.ActiveUser()
 				if activeUser.UID == 0 {
-					fmt.Println("请先登录")
+					fmt.Println("Please login first")
 					return nil
 				}
 				if c.NArg() >= 2 {
@@ -632,27 +591,27 @@ func main() {
 				}
 				activeUser.AccessToken = c.Args().Get(0)
 				pcsconfig.Config.ActiveUserBaiduPCS().SetaccessToken(c.Args().Get(0))
-				fmt.Printf("当前用户名: %s 成功设置accessToken: %s\n", activeUser.Name, activeUser.AccessToken)
+				fmt.Printf("Current username: %s, accessToken set: %s\n", activeUser.Name, activeUser.AccessToken)
 				return nil
 			},
 		},
 		{
 			Name:        "who",
-			Usage:       "获取当前帐号",
-			Description: "获取当前帐号的信息",
-			Category:    "百度帐号",
+			Usage:       "Get current account",
+			Description: "Get current account information",
+			Category:    "Baidu Account",
 			Before:      reloadFn,
 			Action: func(c *cli.Context) error {
 				activeUser := pcsconfig.Config.ActiveUser()
-				fmt.Printf("当前帐号 uid: %d, 用户名: %s, 性别: %s, 年龄: %.1f\n", activeUser.UID, activeUser.Name, activeUser.Sex, activeUser.Age)
+				fmt.Printf("Current account uid: %d, username: %s, gender: %s, age: %.1f\n", activeUser.UID, activeUser.Name, activeUser.Sex, activeUser.Age)
 				return nil
 			},
 		},
 		{
 			Name:        "quota",
-			Usage:       "获取网盘配额",
-			Description: "获取网盘的总储存空间, 和已使用的储存空间",
-			Category:    "百度网盘",
+			Usage:       "Get cloud storage quota",
+			Description: "Get total and used cloud storage space",
+			Category:    "Baidu Netdisk",
 			Before:      reloadFn,
 			Action: func(c *cli.Context) error {
 				pcscommand.RunGetQuota()
@@ -661,28 +620,9 @@ func main() {
 		},
 		{
 			Name:     "cd",
-			Category: "百度网盘",
-			Usage:    "切换工作目录",
-			Description: `
-	BaiduPCS-Go cd <目录, 绝对路径或相对路径>
-
-	示例:
-
-	切换 /我的资源 工作目录:
-	BaiduPCS-Go cd /我的资源
-
-	切换上级目录:
-	BaiduPCS-Go cd ..
-
-	切换根目录:
-	BaiduPCS-Go cd /
-
-	切换 /我的资源 工作目录, 并自动列出 /我的资源 下的文件和目录
-	BaiduPCS-Go cd -l 我的资源
-
-	使用通配符:
-	BaiduPCS-Go cd /我的*
-`,
+			Category: "Baidu Netdisk",
+			Usage:    "Change working directory",
+			Description: "See command usage and options for details.",
 			Before: reloadFn,
 			After:  saveFunc,
 			Action: func(c *cli.Context) error {
@@ -698,36 +638,17 @@ func main() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "l",
-					Usage: "切换工作目录后自动列出工作目录下的文件和目录",
+					Usage: "List workdir contents after changing directory",
 				},
 			},
 		},
 		{
 			Name:      "ls",
 			Aliases:   []string{"l", "ll"},
-			Usage:     "列出目录",
-			UsageText: app.Name + " ls <目录>",
-			Description: `
-	列出当前工作目录内的文件和目录, 或指定目录内的文件和目录
-
-	示例:
-
-	列出 我的资源 内的文件和目录
-	BaiduPCS-Go ls 我的资源
-
-	绝对路径
-	BaiduPCS-Go ls /我的资源
-
-	降序排序
-	BaiduPCS-Go ls -desc 我的资源
-
-	按文件大小降序排序
-	BaiduPCS-Go ls -size -desc 我的资源
-
-	使用通配符
-	BaiduPCS-Go ls /我的*
-`,
-			Category: "百度网盘",
+			Usage:     "List directory",
+			UsageText: app.Name + " ls <dir>",
+			Description: "See command usage and options for details.",
+			Category: "Baidu Netdisk",
 			Before:   reloadFn,
 			Action: func(c *cli.Context) error {
 				orderOptions := &baidupcs.OrderOptions{}
@@ -760,51 +681,37 @@ func main() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "l",
-					Usage: "详细显示",
+					Usage: "Detailed output",
 				},
 				cli.BoolFlag{
 					Name:  "asc",
-					Usage: "升序排序",
+					Usage: "Sort ascending",
 				},
 				cli.BoolFlag{
 					Name:  "desc",
-					Usage: "降序排序",
+					Usage: "Sort descending",
 				},
 				cli.BoolFlag{
 					Name:  "time",
-					Usage: "根据时间排序",
+					Usage: "Sort by time",
 				},
 				cli.BoolFlag{
 					Name:  "name",
-					Usage: "根据文件名排序",
+					Usage: "Sort by name",
 				},
 				cli.BoolFlag{
 					Name:  "size",
-					Usage: "根据大小排序",
+					Usage: "Sort by size",
 				},
 			},
 		},
 		{
 			Name:      "search",
 			Aliases:   []string{"s"},
-			Usage:     "搜索文件",
-			UsageText: app.Name + " search [-path=<需要检索的目录>] [-r] 关键字",
-			Description: `
-	按文件名搜索文件（不支持查找目录）。
-	默认在当前工作目录搜索.
-
-	示例:
-
-	搜索根目录的文件
-	BaiduPCS-Go search -path=/ 关键字
-
-	搜索当前工作目录的文件
-	BaiduPCS-Go search 关键字
-
-	递归搜索当前工作目录的文件
-	BaiduPCS-Go search -r 关键字
-`,
-			Category: "百度网盘",
+			Usage:     "Search files",
+			UsageText: app.Name + " search [-path=<directory>] [-r] <keyword>",
+			Description: "See command usage and options for details.",
+			Category: "Baidu Netdisk",
 			Before:   reloadFn,
 			Action: func(c *cli.Context) error {
 				if c.NArg() < 1 {
@@ -822,15 +729,15 @@ func main() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "l",
-					Usage: "详细显示",
+					Usage: "Detailed output",
 				},
 				cli.BoolFlag{
 					Name:  "r",
-					Usage: "递归搜索",
+					Usage: "Search recursively",
 				},
 				cli.StringFlag{
 					Name:  "path",
-					Usage: "需要检索的目录",
+					Usage: "directory to search",
 					Value: ".",
 				},
 			},
@@ -838,24 +745,10 @@ func main() {
 		{
 			Name:      "tree",
 			Aliases:   []string{"t"},
-			Usage:     "列出目录的树形图",
-			UsageText: app.Name + " tree <目录>",
-			Description: `
-	列出目录树形图。
-	默认从当前工作目录开始列出.
-
-	示例:
-
-	从根目录开始列出
-	BaiduPCS-Go tree /
-
-	只列出两层深度
-	BaiduPCS-Go tree --depth 2
-
-	同时显示文件名和fsid
-	BaiduPCS-Go tree --fsid
-`,
-			Category: "百度网盘",
+			Usage:     "List directory tree",
+			UsageText: app.Name + " tree <dir>",
+			Description: "See command usage and options for details.",
+			Category: "Baidu Netdisk",
 			Before:   reloadFn,
 			Action: func(c *cli.Context) error {
 				pcscommand.RunTree(c.Args().Get(0), 0, &pcscommand.TreeOptions{
@@ -867,20 +760,20 @@ func main() {
 			Flags: []cli.Flag{
 				cli.IntFlag{
 					Name:  "depth",
-					Usage: "显示深度",
+					Usage: "Tree depth",
 					Value: -1,
 				},
 				cli.BoolFlag{
 					Name:  "fsid",
-					Usage: "带fsid显示",
+					Usage: "Include fsid",
 				},
 			},
 		},
 		{
 			Name:      "pwd",
-			Usage:     "输出工作目录",
+			Usage:     "Print working directory",
 			UsageText: app.Name + " pwd",
-			Category:  "百度网盘",
+			Category:  "Baidu Netdisk",
 			Before:    reloadFn,
 			Action: func(c *cli.Context) error {
 				fmt.Println(pcsconfig.Config.ActiveUser().Workdir)
@@ -889,10 +782,10 @@ func main() {
 		},
 		{
 			Name:        "meta",
-			Usage:       "获取文件/目录的元信息",
-			UsageText:   app.Name + " meta <文件/目录1> <文件/目录2> <文件/目录3> ...",
-			Description: "默认获取工作目录元信息",
-			Category:    "百度网盘",
+			Usage:       "Get file/directory metadata",
+			UsageText:   app.Name + " meta <file/dir1> <file/dir2> <file/dir3> ...",
+			Description: "Default: metadata of current workdir",
+			Category:    "Baidu Netdisk",
 			Before:      reloadFn,
 			Action: func(c *cli.Context) error {
 				var (
@@ -911,27 +804,10 @@ func main() {
 		},
 		{
 			Name:      "rm",
-			Usage:     "删除文件/目录",
-			UsageText: app.Name + " rm <文件/目录的路径1> <文件/目录2> <文件/目录3> ...",
-			Description: `
-	注意: 删除多个文件和目录时, 请确保每一个文件和目录都存在, 否则删除操作会失败.
-	被删除的文件或目录可在网盘文件回收站找回.
-
-	示例:
-
-	删除 /我的资源/1.mp4
-	BaiduPCS-Go rm /我的资源/1.mp4
-
-	删除 /我的资源/1.mp4 和 /我的资源/2.mp4
-	BaiduPCS-Go rm /我的资源/1.mp4 /我的资源/2.mp4
-
-	删除 /我的资源 内的所有文件和目录, 但不删除该目录
-	BaiduPCS-Go rm /我的资源/*
-
-	删除 /我的资源 整个目录 !!
-	BaiduPCS-Go rm /我的资源
-`,
-			Category: "百度网盘",
+			Usage:     "Delete file/directory",
+			UsageText: app.Name + " rm <file/dir path1> <file/dir2> <file/dir3> ...",
+			Description: "See command usage and options for details.",
+			Category: "Baidu Netdisk",
 			Before:   reloadFn,
 			Action: func(c *cli.Context) error {
 				if c.NArg() == 0 {
@@ -945,9 +821,9 @@ func main() {
 		},
 		{
 			Name:      "mkdir",
-			Usage:     "创建目录",
-			UsageText: app.Name + " mkdir <目录>",
-			Category:  "百度网盘",
+			Usage:     "Create directory",
+			UsageText: app.Name + " mkdir <dir>",
+			Category:  "Baidu Netdisk",
 			Before:    reloadFn,
 			Action: func(c *cli.Context) error {
 				if c.NArg() == 0 {
@@ -961,21 +837,11 @@ func main() {
 		},
 		{
 			Name:  "cp",
-			Usage: "拷贝文件/目录",
-			UsageText: `BaiduPCS-Go cp <文件/目录> <目标文件/目录>
-	BaiduPCS-Go cp <文件/目录1> <文件/目录2> <文件/目录3> ... <目标目录>`,
-			Description: `
-	注意: 拷贝多个文件和目录时, 请确保每一个文件和目录都存在, 否则拷贝操作会失败.
-
-	示例:
-
-	将 /我的资源/1.mp4 复制到 根目录 /
-	BaiduPCS-Go cp /我的资源/1.mp4 /
-
-	将 /我的资源/1.mp4 和 /我的资源/2.mp4 复制到 根目录 /
-	BaiduPCS-Go cp /我的资源/1.mp4 /我的资源/2.mp4 /
-`,
-			Category: "百度网盘",
+			Usage: "Copy file/directory",
+			UsageText: `BaiduPCS-Go cp </> </>
+	BaiduPCS-Go cp </1> </2> </3> ... <target dir>`,
+			Description: "See command usage and options for details.",
+			Category: "Baidu Netdisk",
 			Before:   reloadFn,
 			Action: func(c *cli.Context) error {
 				if c.NArg() <= 1 {
@@ -989,24 +855,14 @@ func main() {
 		},
 		{
 			Name:  "mv",
-			Usage: "移动/重命名文件/目录",
-			UsageText: `移动:
-	BaiduPCS-Go mv <文件/目录1> <文件/目录2> <文件/目录3> ... <目标目录>
+			Usage: "Move/rename file/directory",
+			UsageText: `:
+	BaiduPCS-Go mv </1> </2> </3> ... <target dir>
 
-	重命名:
-	BaiduPCS-Go mv <文件/目录> <重命名的文件/目录>`,
-			Description: `
-	注意: 移动多个文件和目录时, 请确保每一个文件和目录都存在, 否则移动操作会失败.
-
-	示例:
-
-	将 /我的资源/1.mp4 移动到 根目录 /
-	BaiduPCS-Go mv /我的资源/1.mp4 /
-
-	将 /我的资源/1.mp4 重命名为 /我的资源/3.mp4
-	BaiduPCS-Go mv /我的资源/1.mp4 /我的资源/3.mp4
-`,
-			Category: "百度网盘",
+	:
+	BaiduPCS-Go mv </> </>`,
+			Description: "See command usage and options for details.",
+			Category: "Baidu Netdisk",
 			Before:   reloadFn,
 			Action: func(c *cli.Context) error {
 				if c.NArg() <= 1 {
@@ -1021,39 +877,10 @@ func main() {
 		{
 			Name:      "download",
 			Aliases:   []string{"d"},
-			Usage:     "下载文件/目录",
-			UsageText: app.Name + " download <文件/目录路径1> <文件/目录2> <文件/目录3> ...",
-			Description: `
-	下载的文件默认保存到, 程序所在目录的 download/ 目录.
-	通过 BaiduPCS-Go config set -savedir <savedir>, 自定义保存的目录.
-	支持多个文件或目录下载.
-	支持下载完成后自动校验文件, 但并不是所有的文件都支持校验!
-	自动跳过下载重名的文件!
-
-	下载模式说明:
-		pcs: 通过百度网盘的 PCS API 下载, locate模式提示user is not authorized可尝试此模式
-		stream: 通过百度网盘的 PCS API, 以流式文件的方式下载, 效果同 pcs
-		locate: 默认的下载模式。从百度网盘 Android 客户端, 获取下载链接的方式来下载
-
-	示例:
-
-	设置保存目录, 保存到 D:\Downloads
-	注意区别反斜杠 "\" 和 斜杠 "/" !!!
-	BaiduPCS-Go config set -savedir D:\\Downloads
-	或者
-	BaiduPCS-Go config set -savedir D:/Downloads
-
-	下载 /我的资源/1.mp4
-	BaiduPCS-Go d /我的资源/1.mp4
-
-	下载 /我的资源 整个目录!!
-	BaiduPCS-Go d /我的资源
-
-	下载网盘内的全部文件!!
-	BaiduPCS-Go d /
-	BaiduPCS-Go d *
-`,
-			Category: "百度网盘",
+			Usage:     "Download file/directory",
+			UsageText: app.Name + " download <file/dir path1> <file/dir2> <file/dir3> ...",
+			Description: "See command usage and options for details.",
+			Category: "Baidu Netdisk",
 			Before:   reloadFn,
 			Action: func(c *cli.Context) error {
 				if c.NArg() == 0 {
@@ -1061,7 +888,7 @@ func main() {
 					return nil
 				}
 
-				// 处理saveTo
+				// saveTo
 				var (
 					saveTo string
 				)
@@ -1071,7 +898,7 @@ func main() {
 					saveTo = filepath.Clean(c.String("saveto"))
 				}
 
-				// 处理解析downloadMode
+				// downloadMode
 				var (
 					downloadMode pcsdownload.DownloadMode
 				)
@@ -1083,7 +910,7 @@ func main() {
 				case "locate":
 					downloadMode = pcsdownload.DownloadModeLocate
 				default:
-					fmt.Println("下载方式解析失败")
+					fmt.Println("Failed to parse download mode")
 					cli.ShowCommandHelp(c, c.Command.Name)
 					return nil
 				}
@@ -1111,98 +938,71 @@ func main() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "test",
-					Usage: "测试下载, 此操作不会保存文件到本地",
+					Usage: "Test download, will not save files locally",
 				},
 				cli.BoolFlag{
 					Name:  "ow",
-					Usage: "overwrite, 覆盖已存在的文件",
+					Usage: "overwrite existing files",
 				},
 				cli.BoolFlag{
 					Name:  "status",
-					Usage: "输出所有线程的工作状态",
+					Usage: "Print all worker statuses",
 				},
 				cli.BoolFlag{
 					Name:  "save",
-					Usage: "将下载的文件直接保存到当前工作目录",
+					Usage: "Save downloaded files to current workdir",
 				},
 				cli.StringFlag{
 					Name:  "saveto",
-					Usage: "将下载的文件直接保存到指定的目录",
+					Usage: "Save downloaded files to specified directory",
 				},
 				cli.BoolFlag{
 					Name:  "x",
-					Usage: "为文件加上执行权限, (windows系统无效)",
+					Usage: "Add executable permission (not effective on Windows)",
 				},
 				cli.StringFlag{
 					Name:  "mode",
-					Usage: "下载模式, 可选值: pcs, stream, locate, 默认为 locate, 相关说明见上面的帮助",
+					Usage: "Download mode: pcs, stream, locate. Default is locate; see help above",
 					Value: "locate",
 				},
 				cli.IntFlag{
 					Name:  "p",
-					Usage: "指定下载线程数",
+					Usage: "Set download thread count",
 				},
 				cli.IntFlag{
 					Name:  "l",
-					Usage: "指定同时进行下载文件的数量",
+					Usage: "Set number of files downloading simultaneously",
 				},
 				cli.IntFlag{
 					Name:  "retry",
-					Usage: "下载失败最大重试次数",
+					Usage: "Max retry count for failed downloads",
 					Value: pcsdownload.DefaultDownloadMaxRetry,
 				},
 				cli.BoolFlag{
 					Name:  "nocheck",
-					Usage: "下载文件完成后不校验文件",
+					Usage: "Do not verify file after download",
 				},
 				cli.BoolFlag{
 					Name:  "mtime",
-					Usage: "将本地文件的修改时间设置为服务器上的修改时间",
+					Usage: "Set local file mtime to server mtime",
 				},
 				cli.IntFlag{
 					Name:  "dindex",
-					Usage: "使用备选下载链接中的第几个，默认第一个",
+					Usage: "Choose which alternative link to use, default is first",
 				},
 				cli.BoolFlag{
 					Name:  "fullpath",
-					Usage: "以网盘完整路径保存到本地",
+					Usage: "Save using full cloud path locally",
 				},
 			},
 		},
 		{
 			Name:      "upload",
 			Aliases:   []string{"u"},
-			Usage:     "上传文件/目录",
-			UsageText: app.Name + " upload <本地文件/目录的路径1> <文件/目录2> <文件/目录3> ... <目标目录>",
-			Description: `
-	上传默认采用分片上传的方式, 上传的文件将会保存到, <目标目录>.
-	当上传的文件名和网盘的目录名称相同时, 不会覆盖目录, 防止丢失数据.
-
-	注意: 
-
-	分片上传之后, 服务器可能会记录到错误的文件md5, 可使用 fixmd5 命令尝试修复文件的MD5值, 修复md5不一定能成功, 但文件的完整性是没问题的.
-	fixmd5 命令使用方法:
-	BaiduPCS-Go fixmd5 -h
-
-	禁用分片上传可以保证服务器记录到正确的md5.
-	禁用分片上传时只能使用单线程上传, 指定的单个文件上传最大线程数将会无效.
-
-	示例:
-
-	1. 将本地的 C:\Users\Administrator\Desktop\1.mp4 上传到网盘 /视频 目录
-	注意区别反斜杠 "\" 和 斜杠 "/" !!!
-	BaiduPCS-Go upload C:/Users/Administrator/Desktop/1.mp4 /视频
-
-	2. 将本地的 C:\Users\Administrator\Desktop\1.mp4 和 C:\Users\Administrator\Desktop\2.mp4 上传到网盘 /视频 目录
-	BaiduPCS-Go upload C:/Users/Administrator/Desktop/1.mp4 C:/Users/Administrator/Desktop/2.mp4 /视频
-
-	3. 将本地的 C:\Users\Administrator\Desktop 整个目录上传到网盘 /视频 目录
-	BaiduPCS-Go upload C:/Users/Administrator/Desktop /视频
-
-	4. 使用相对路径
-	BaiduPCS-Go upload 1.mp4 /视频
-`,
-			Category: "百度网盘",
+			Usage:     "Upload file/directory",
+			UsageText: app.Name + " upload <local file/dir path1> <file/dir2> <file/dir3> ... <target dir>",
+			Description: "See command usage and options for details.",
+			Category: "Baidu Netdisk",
 			Before:   reloadFn,
 			Action: func(c *cli.Context) error {
 				if c.NArg() < 2 {
@@ -1223,39 +1023,39 @@ func main() {
 			Flags: []cli.Flag{
 				cli.IntFlag{
 					Name:  "p",
-					Usage: "指定单个文件上传的最大线程数",
+					Usage: "Set max upload threads per file",
 				},
 				cli.IntFlag{
 					Name:  "retry",
-					Usage: "上传失败最大重试次数",
+					Usage: "Max retry count for failed uploads",
 					Value: pcscommand.DefaultUploadMaxRetry,
 				},
 				cli.IntFlag{
 					Name:  "l",
-					Usage: "指定同时上传的最大文件数",
+					Usage: "Set max number of files uploading simultaneously",
 				},
 				cli.BoolFlag{
 					Name:  "norapid",
-					Usage: "跳过秒传",
+					Usage: "Skip rapid upload",
 				},
 				cli.StringFlag{
 					Name:  "policy",
-					Usage: fmt.Sprintf("对同名文件的处理策略 (default: %s), %s, %s", baidupcs.SkipPolicy, baidupcs.OverWritePolicy, baidupcs.RsyncPolicy),
+					Usage: fmt.Sprintf("Duplicate file policy (default: %s), %s, %s", baidupcs.SkipPolicy, baidupcs.OverWritePolicy, baidupcs.RsyncPolicy),
 				},
 			},
 		},
 		{
 			Name:      "locate",
 			Aliases:   []string{"lt"},
-			Usage:     "获取下载直链",
-			UsageText: app.Name + " locate <文件1> <文件2> ...",
+			Usage:     "Get direct download links",
+			UsageText: app.Name + " locate <file1> <file2> ...",
 			Description: fmt.Sprintf(`
-	获取下载直链
+	Get direct download links
 
-	若该功能无法正常使用, 提示"user is not authorized, hitcode:xxx", 尝试更换 User-Agent 为 %s:
+	, "user is not authorized, hitcode:xxx",  User-Agent  %s:
 	BaiduPCS-Go config set -user_agent "%s"
 `, baidupcs.NetdiskUA, baidupcs.NetdiskUA),
-			Category: "百度网盘",
+			Category: "Baidu Netdisk",
 			Before:   reloadFn,
 			Action: func(c *cli.Context) error {
 				if c.NArg() < 1 {
@@ -1273,24 +1073,17 @@ func main() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "pan",
-					Usage: "从百度网盘首页获取下载链接",
+					Usage: "Get download links from Baidu Netdisk home API",
 				},
 			},
 		},
 		{
 			Name:      "sumfile",
 			Aliases:   []string{"sf"},
-			Usage:     "获取本地文件的秒传信息(目前秒传功能已失效)",
-			UsageText: app.Name + " sumfile <本地文件的路径1> <本地文件的路径2> ...",
-			Description: `
-	获取本地文件的大小, md5, 前256KB切片的md5, crc32, 曾经可用于秒传文件.
-
-	示例:
-
-	获取 C:\Users\Administrator\Desktop\1.mp4 的秒传信息
-	BaiduPCS-Go sumfile C:/Users/Administrator/Desktop/1.mp4
-`,
-			Category: "其他",
+			Usage:     "Get local rapid-upload info (rapid-upload is currently unavailable)",
+			UsageText: app.Name + " sumfile <local file path1> <local file path2> ...",
+			Description: "See command usage and options for details.",
+			Category: "Other",
 			Before:   reloadFn,
 			Action: func(c *cli.Context) error {
 				if c.NArg() <= 0 {
@@ -1314,12 +1107,12 @@ func main() {
 					tb := pcstable.NewTable(os.Stdout)
 					tb.SetColumnAlignment([]int{tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT})
 					tb.AppendBulk([][]string{
-						[]string{"文件大小", strLength},
+						[]string{"File size", strLength},
 						[]string{"md5", strMd5},
-						[]string{"前256KB切片的md5", strSliceMd5},
+						[]string{"MD5 of first 256KB slice", strSliceMd5},
 						[]string{"crc32", strCrc32},
-						[]string{"秒传命令", app.Name + " rapidupload -length=" + strLength + " -md5=" + strMd5 + " -slicemd5=" + strSliceMd5 + " -crc32=" + strCrc32 + " " + fileName},
-						[]string{"通用秒传链接", strMd5 + "#" + strSliceMd5 + "#" + strLength + "#" + regFileName},
+						[]string{"Rapid upload command", app.Name + " rapidupload -length=" + strLength + " -md5=" + strMd5 + " -slicemd5=" + strSliceMd5 + " -crc32=" + strCrc32 + " " + fileName},
+						[]string{"Generic rapid-upload link", strMd5 + "#" + strSliceMd5 + "#" + strLength + "#" + regFileName},
 					})
 					tb.Render()
 					fmt.Printf("\n")
@@ -1330,21 +1123,11 @@ func main() {
 		},
 		{
 			Name:      "transfer",
-			Usage:     "转存文件/目录",
-			UsageText: app.Name + " transfer <分享链接> <提取码>(如果有)",
-			Category:  "百度网盘",
+			Usage:     "Save shared file/directory to cloud",
+			UsageText: app.Name + " transfer <share link> <extract code> (if any)",
+			Category:  "Baidu Netdisk",
 			Before:    reloadFn,
-			Description: `
-			转存文件/目录
-	如果没有提取码或为整合式链接，则第二个位置留空；只能转存到当前网盘目录下，
-	分享链接支持常规百度云链接, 支持长短秒传链接
-	
-	实例：
-	BaiduPCS-Go transfer pan.baidu.com/s/1VYzSl7465sdrQXe8GT5RdQ 704e
-	BaiduPCS-Go transfer https://pan.baidu.com/s/1VYzSl7465sdrQXe8GT5RdQ 704e
-	BaiduPCS-Go transfer https://pan.baidu.com/s/1VYzSl7465sdrQXe8GT5RdQ?pwd=704e
-
-	`,
+			Description: "See command usage and options for details.",
 			Action: func(c *cli.Context) error {
 				if c.NArg() < 1 || c.NArg() > 2 {
 					cli.ShowCommandHelp(c, c.Command.Name)
@@ -1361,23 +1144,23 @@ func main() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "download",
-					Usage: "转存后直接下载到本地默认目录",
+					Usage: "Download to local default dir after transfer",
 				},
 				cli.BoolFlag{
 					Name:  "collect",
-					Usage: "多文件整合到一个文件夹中转存",
+					Usage: "Collect multiple files into one folder when transferring",
 				},
 				cli.BoolFlag{
 					Name:  "rname",
-					Usage: "秒传随机替换4位文件名提高成功率",
+					Usage: "Randomly replace 4 chars in filename to improve rapid-transfer success",
 				},
 			},
 		},
 		{
 			Name:      "share",
-			Usage:     "分享文件/目录",
+			Usage:     "Share file/directory",
 			UsageText: app.Name + " share",
-			Category:  "百度网盘",
+			Category:  "Baidu Netdisk",
 			Before:    reloadFn,
 			Action: func(c *cli.Context) error {
 				cli.ShowCommandHelp(c, c.Command.Name)
@@ -1387,9 +1170,9 @@ func main() {
 				{
 					Name:        "set",
 					Aliases:     []string{"s"},
-					Usage:       "设置分享文件/目录",
-					UsageText:   app.Name + " share set <文件/目录1> <文件/目录2> ...",
-					Description: `支持任意有效天数, 支持自定义提取码.`,
+					Usage:       "Set share target",
+					UsageText:   app.Name + " share set <file/dir1> <file/dir2> ...",
+					Description: "See command usage and options for details.",
 					Action: func(c *cli.Context) error {
 						if c.NArg() < 1 {
 							cli.ShowCommandHelp(c, c.Command.Name)
@@ -1406,24 +1189,24 @@ func main() {
 					Flags: []cli.Flag{
 						cli.StringFlag{
 							Name:  "p",
-							Usage: "提取码",
+							Usage: "Extract code",
 							Value: "",
 						},
 						cli.IntFlag{
 							Name:  "period",
-							Usage: "有效天数, 0为永久",
+							Usage: "Valid days, 0 means permanent",
 							Value: 0,
 						},
 						cli.BoolFlag{
 							Name:  "f",
-							Usage: "输出带密码的完整链接格式",
+							Usage: "Output full link format with password",
 						},
 					},
 				},
 				{
 					Name:      "list",
 					Aliases:   []string{"l"},
-					Usage:     "列出已分享文件/目录",
+					Usage:     "List shared files/directories",
 					UsageText: app.Name + " share list",
 					Action: func(c *cli.Context) error {
 						pcscommand.RunShareList(c.Int("page"))
@@ -1432,7 +1215,7 @@ func main() {
 					Flags: []cli.Flag{
 						cli.IntFlag{
 							Name:  "page",
-							Usage: "分享列表的页数",
+							Usage: "Page number for share list",
 							Value: 1,
 						},
 					},
@@ -1440,9 +1223,9 @@ func main() {
 				{
 					Name:        "cancel",
 					Aliases:     []string{"c"},
-					Usage:       "取消分享文件/目录",
+					Usage:       "Cancel sharing files/directories",
 					UsageText:   app.Name + " share cancel <shareid_1> <shareid_2> ...",
-					Description: `目前只支持通过分享id (shareid) 来取消分享.`,
+					Description: "See command usage and options for details.",
 					Action: func(c *cli.Context) error {
 						if c.NArg() < 1 {
 							cli.ShowCommandHelp(c, c.Command.Name)
@@ -1457,29 +1240,10 @@ func main() {
 		{
 			Name:      "export",
 			Aliases:   []string{"ep"},
-			Usage:     "导出文件/目录",
-			UsageText: app.Name + " export <文件/目录1> <文件/目录2> ...",
-			Description: `
-	导出网盘内的文件或目录, 原理为秒传文件, 此操作会生成导出文件或目录的命令.
-
-	注意!!! :
-	由于秒传已经失效, 导出信息已无法用做公开分享
-	无法导出 20GB 以上的文件!!
-	无法导出文件的版本历史等数据!!
-	并不是所有的文件都能导出成功, 程序会列出无法导出的文件列表.
-
-	示例:
-
-	导出当前工作目录:
-	BaiduPCS-Go export
-
-	导出所有文件和目录, 并设置新的根目录为 /root 
-	BaiduPCS-Go export -root=/root /
-
-	导出 /我的资源
-	BaiduPCS-Go export /我的资源
-`,
-			Category: "百度网盘",
+			Usage:     "Export file/directory",
+			UsageText: app.Name + " export <file/dir1> <file/dir2> ...",
+			Description: "See command usage and options for details.",
+			Category: "Baidu Netdisk",
 			Before:   reloadFn,
 			Action: func(c *cli.Context) error {
 				pcspaths := c.Args()
@@ -1500,52 +1264,37 @@ func main() {
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "root",
-					Usage: "设置要导出文件或目录的根路径, 可以是相对路径",
+					Usage: "Set root path for export (can be relative)",
 				},
 				cli.StringFlag{
 					Name:  "out",
-					Usage: "导出文件信息的保存路径",
+					Usage: "Output path for exported file info",
 				},
 				cli.IntFlag{
 					Name:  "retry",
-					Usage: "导出失败的重试次数",
+					Usage: "Retry count for export failures",
 					Value: 3,
 				},
 				cli.BoolFlag{
 					Name:  "r",
-					Usage: "递归导出",
+					Usage: "Export recursively",
 				},
 				cli.BoolFlag{
 					Name:  "link",
-					Usage: "以通用秒传链接格式导出(将丢失路径信息)",
+					Usage: "Export in generic rapid-upload link format (path info will be lost)",
 				},
 				cli.BoolFlag{
 					Name:  "stdout",
-					Usage: "导出信息不存文件, 直接打印至标准输出",
+					Usage: "Do not write export to file, print to stdout",
 				},
 			},
 		},
 		{
 			Name:    "offlinedl",
 			Aliases: []string{"clouddl", "od"},
-			Usage:   "离线下载",
-			Description: `支持http/https/ftp/电驴/磁力链协议
-	离线下载同时进行的任务数量有限, 超出限制的部分将无法添加.
-
-	示例:
-
-	1. 将百度和腾讯主页, 离线下载到根目录 /
-	BaiduPCS-Go offlinedl add -path=/ http://baidu.com http://qq.com
-
-	2. 添加磁力链接任务
-	BaiduPCS-Go offlinedl add magnet:?xt=urn:btih:xxx
-
-	3. 查询任务ID为 12345 的离线下载任务状态
-	BaiduPCS-Go offlinedl query 12345
-
-	4. 取消任务ID为 12345 的离线下载任务
-	BaiduPCS-Go offlinedl cancel 12345`,
-			Category: "百度网盘",
+			Usage:   "Offline download",
+			Description: "See command usage and options for details.",
+			Category: "Baidu Netdisk",
 			Before:   reloadFn,
 			Action: func(c *cli.Context) error {
 				cli.ShowCommandHelp(c, c.Command.Name)
@@ -1555,8 +1304,8 @@ func main() {
 				{
 					Name:      "add",
 					Aliases:   []string{"a"},
-					Usage:     "添加离线下载任务",
-					UsageText: app.Name + " offlinedl add -path=<离线下载文件保存的路径> 资源地址1 地址2 ...",
+					Usage:     "Add offline download task",
+					UsageText: app.Name + " offlinedl add -path=<offline save path> url1 url2 ...",
 					Action: func(c *cli.Context) error {
 						if c.NArg() < 1 {
 							cli.ShowCommandHelp(c, c.Command.Name)
@@ -1569,15 +1318,15 @@ func main() {
 					Flags: []cli.Flag{
 						cli.StringFlag{
 							Name:  "path",
-							Usage: "离线下载文件保存的路径, 默认为工作目录",
+							Usage: "Offline download save path, default is current workdir",
 						},
 					},
 				},
 				{
 					Name:      "query",
 					Aliases:   []string{"q"},
-					Usage:     "精确查询离线下载任务",
-					UsageText: app.Name + " offlinedl query 任务ID1 任务ID2 ...",
+					Usage:     "Query offline download tasks by ID",
+					UsageText: app.Name + " offlinedl query task_id1 task_id2 ...",
 					Action: func(c *cli.Context) error {
 						if c.NArg() < 1 {
 							cli.ShowCommandHelp(c, c.Command.Name)
@@ -1587,7 +1336,7 @@ func main() {
 						taskIDs := converter.SliceStringToInt64(c.Args())
 
 						if len(taskIDs) == 0 {
-							fmt.Printf("未找到合法的任务ID, task_id\n")
+							fmt.Printf("No valid task ID found, task_id\n")
 							return nil
 						}
 
@@ -1598,7 +1347,7 @@ func main() {
 				{
 					Name:      "list",
 					Aliases:   []string{"ls", "l"},
-					Usage:     "查询离线下载任务列表",
+					Usage:     "List offline download tasks",
 					UsageText: app.Name + " offlinedl list",
 					Action: func(c *cli.Context) error {
 						pcscommand.RunCloudDlListTask()
@@ -1608,8 +1357,8 @@ func main() {
 				{
 					Name:      "cancel",
 					Aliases:   []string{"c"},
-					Usage:     "取消离线下载任务",
-					UsageText: app.Name + " offlinedl cancel 任务ID1 任务ID2 ...",
+					Usage:     "Cancel offline download tasks",
+					UsageText: app.Name + " offlinedl cancel task_id1 task_id2 ...",
 					Action: func(c *cli.Context) error {
 						if c.NArg() < 1 {
 							cli.ShowCommandHelp(c, c.Command.Name)
@@ -1619,7 +1368,7 @@ func main() {
 						taskIDs := converter.SliceStringToInt64(c.Args())
 
 						if len(taskIDs) == 0 {
-							fmt.Printf("未找到合法的任务ID, task_id\n")
+							fmt.Printf("No valid task ID found, task_id\n")
 							return nil
 						}
 
@@ -1630,8 +1379,8 @@ func main() {
 				{
 					Name:      "delete",
 					Aliases:   []string{"del", "d"},
-					Usage:     "删除离线下载任务",
-					UsageText: app.Name + " offlinedl delete 任务ID1 任务ID2 ...",
+					Usage:     "Delete offline download tasks",
+					UsageText: app.Name + " offlinedl delete task_id1 task_id2 ...",
 					Action: func(c *cli.Context) error {
 						isClear := c.Bool("all")
 						if c.NArg() < 1 && !isClear {
@@ -1639,16 +1388,16 @@ func main() {
 							return nil
 						}
 
-						// 清空离线下载任务记录
+						// Offline download
 						if isClear {
 							pcscommand.RunCloudDlClearTask()
 							return nil
 						}
 
-						// 删除特定的离线下载任务记录
+						// Offline download
 						taskIDs := converter.SliceStringToInt64(c.Args())
 						if len(taskIDs) == 0 {
-							fmt.Printf("未找到合法的任务ID, task_id\n")
+							fmt.Printf("No valid task ID found, task_id\n")
 							return nil
 						}
 
@@ -1658,7 +1407,7 @@ func main() {
 					Flags: []cli.Flag{
 						cli.BoolFlag{
 							Name:  "all",
-							Usage: "清空离线下载任务记录, 程序不会进行二次确认, 谨慎操作!!!",
+							Usage: "Clear offline download task records; no second confirmation, use with caution!!!",
 						},
 					},
 				},
@@ -1666,22 +1415,9 @@ func main() {
 		},
 		{
 			Name:  "recycle",
-			Usage: "回收站",
-			Description: `
-	回收站操作.
-
-	示例:
-
-	1. 从回收站还原两个文件, 其中的两个文件的 fs_id 分别为 1013792297798440 和 643596340463870
-	BaiduPCS-Go recycle restore 1013792297798440 643596340463870
-
-	2. 从回收站删除两个文件, 其中的两个文件的 fs_id 分别为 1013792297798440 和 643596340463870
-	BaiduPCS-Go recycle delete 1013792297798440 643596340463870
-
-	3. 清空回收站, 程序不会进行二次确认, 谨慎操作!!!
-	BaiduPCS-Go recycle delete -all
-`,
-			Category: "百度网盘",
+			Usage: "Recycle bin",
+			Description: "See command usage and options for details.",
+			Category: "Baidu Netdisk",
 			Before:   reloadFn,
 			Action: func(c *cli.Context) error {
 				if c.NumFlags() <= 0 || c.NArg() <= 0 {
@@ -1702,7 +1438,7 @@ func main() {
 					Flags: []cli.Flag{
 						cli.IntFlag{
 							Name:  "page",
-							Usage: "回收站文件列表页数",
+							Usage: "Recycle bin list page",
 							Value: 1,
 						},
 					},
@@ -1712,7 +1448,7 @@ func main() {
 					Aliases:     []string{"r"},
 					Usage:       baidupcs.OperationRecycleRestore,
 					UsageText:   app.Name + " recycle restore <fs_id 1> <fs_id 2> <fs_id 3> ...",
-					Description: `根据文件/目录的 fs_id, 还原回收站指定的文件或目录`,
+					Description: "See command usage and options for details.",
 					Action: func(c *cli.Context) error {
 						if c.NArg() <= 0 {
 							cli.ShowCommandHelp(c, c.Command.Name)
@@ -1727,10 +1463,10 @@ func main() {
 					Aliases:     []string{"d"},
 					Usage:       baidupcs.OperationRecycleDelete + "/" + baidupcs.OperationRecycleClear,
 					UsageText:   app.Name + " recycle delete [-all] <fs_id 1> <fs_id 2> <fs_id 3> ...",
-					Description: `根据文件/目录的 fs_id 或 -all 参数, 删除回收站指定的文件或目录或清空回收站`,
+					Description: "See command usage and options for details.",
 					Action: func(c *cli.Context) error {
 						if c.Bool("all") {
-							// 清空回收站
+							// Recycle bin
 							pcscommand.RunRecycleClear()
 							return nil
 						}
@@ -1745,7 +1481,7 @@ func main() {
 					Flags: []cli.Flag{
 						cli.BoolFlag{
 							Name:  "all",
-							Usage: "清空回收站, 程序不会进行二次确认, 谨慎操作!!!",
+							Usage: "Clear recycle bin; no second confirmation, use with caution!!!",
 						},
 					},
 				},
@@ -1753,35 +1489,22 @@ func main() {
 		},
 		{
 			Name:        "config",
-			Usage:       "显示和修改程序配置项",
-			Description: "显示和修改程序配置项",
-			Category:    "配置",
+			Usage:       "Show and modify config items",
+			Description: "Show and modify config items",
+			Category:    "Config",
 			Before:      reloadFn,
 			After:       saveFunc,
 			Action: func(c *cli.Context) error {
-				fmt.Printf("----\n运行 %s config set 可进行设置配置\n\n当前配置:\n", app.Name)
+				fmt.Printf("----\nRun %s config set to update config\n\nCurrent config:\n", app.Name)
 				pcsconfig.Config.PrintTable()
 				return nil
 			},
 			Subcommands: []cli.Command{
 				{
 					Name:      "set",
-					Usage:     "修改程序配置项",
+					Usage:     "Modify config items",
 					UsageText: app.Name + " config set [arguments...]",
-					Description: `
-	注意:
-		可通过设置环境变量 BAIDUPCS_GO_CONFIG_DIR, 指定配置文件存放的目录.
-
-		谨慎修改 appid, user_agent, pcs_ua, pan_ua 的值, 否则访问网盘服务器时, 可能会出现错误
-		cache_size 的值支持可选设置单位了, 单位不区分大小写, b 和 B 均表示字节的意思, 如 64KB, 1MB, 32kb, 65536b, 65536
-		max_download_rate, max_upload_rate 的值支持可选设置单位了, 单位为每秒的传输速率, 后缀'/s' 可省略, 如 2MB/s, 2MB, 2m, 2mb 均为一个意思
-
-	例子:
-		BaiduPCS-Go config set -appid=266719
-		BaiduPCS-Go config set -enable_https=false
-		BaiduPCS-Go config set -user_agent="netdisk;2.2.51.6;netdisk;10.0.63;PC;android-android"
-		BaiduPCS-Go config set -cache_size 64KB
-		BaiduPCS-Go config set -cache_size 16384 -max_parallel 200 -savedir D:/download`,
+					Description: "See command usage and options for details.",
 					Action: func(c *cli.Context) error {
 						if c.NumFlags() <= 0 || c.NArg() > 0 {
 							cli.ShowCommandHelp(c, c.Command.Name)
@@ -1809,7 +1532,7 @@ func main() {
 						if c.IsSet("pcs_addr") {
 							match := pcsconfig.Config.SETPCSAddr(c.String("pcs_addr"))
 							if !match {
-								fmt.Println("设置 pcs_addr 错误: pcs服务器地址不合法")
+								fmt.Println("Failed to set pcs_addr: invalid PCS server address")
 								return nil
 							}
 						}
@@ -1825,7 +1548,7 @@ func main() {
 						if c.IsSet("cache_size") {
 							err := pcsconfig.Config.SetCacheSizeByStr(c.String("cache_size"))
 							if err != nil {
-								fmt.Printf("设置 cache_size 错误: %s\n", err)
+								fmt.Printf("Failed to set cache_size: %s\n", err)
 								return nil
 							}
 						}
@@ -1844,14 +1567,14 @@ func main() {
 						if c.IsSet("max_download_rate") {
 							err := pcsconfig.Config.SetMaxDownloadRateByStr(c.String("max_download_rate"))
 							if err != nil {
-								fmt.Printf("设置 max_download_rate 错误: %s\n", err)
+								fmt.Printf("Failed to set max_download_rate: %s\n", err)
 								return nil
 							}
 						}
 						if c.IsSet("max_upload_rate") {
 							err := pcsconfig.Config.SetMaxUploadRateByStr(c.String("max_upload_rate"))
 							if err != nil {
-								fmt.Printf("设置 max_upload_rate 错误: %s\n", err)
+								fmt.Printf("Failed to set max_upload_rate: %s\n", err)
 								return nil
 							}
 						}
@@ -1875,104 +1598,104 @@ func main() {
 						}
 
 						pcsconfig.Config.PrintTable()
-						fmt.Printf("\n保存配置成功!\n\n")
+						fmt.Printf("\nConfig saved successfully!\n\n")
 
 						return nil
 					},
 					Flags: []cli.Flag{
 						cli.IntFlag{
 							Name:  "appid",
-							Usage: "百度 PCS 应用ID",
+							Usage: "Baidu PCS AppID",
 						},
 						cli.StringFlag{
 							Name:  "cache_size",
-							Usage: "下载缓存",
+							Usage: "Download cache",
 						},
 						cli.IntFlag{
 							Name:  "max_parallel",
-							Usage: "下载网络全部连接的最大并发量",
+							Usage: "Max total download concurrency",
 						},
 						cli.IntFlag{
 							Name:  "max_upload_parallel",
-							Usage: "上传网络单个连接的最大并发量",
+							Usage: "Max upload concurrency per file",
 						},
 						cli.IntFlag{
 							Name:  "max_download_load",
-							Usage: "同时进行下载文件的最大数量",
+							Usage: "Max simultaneous downloading files",
 						},
 						cli.IntFlag{
 							Name:  "max_upload_load",
-							Usage: "同时进行上传文件的最大数量",
+							Usage: "Max simultaneous uploading files",
 						},
 						cli.StringFlag{
 							Name:  "max_download_rate",
-							Usage: "限制最大下载速度, 0代表不限制",
+							Usage: "Limit max download speed, 0 for unlimited",
 						},
 						cli.StringFlag{
 							Name:  "max_upload_rate",
-							Usage: "限制最大上传速度, 0代表不限制",
+							Usage: "Limit max upload speed, 0 for unlimited",
 						},
 						cli.StringFlag{
 							Name:  "savedir",
-							Usage: "下载文件的储存目录",
+							Usage: "Save directory for downloads",
 						},
 						cli.BoolFlag{
 							Name:  "enable_https",
-							Usage: "启用 https",
+							Usage: "Enable HTTPS",
 						},
 						cli.BoolFlag{
 							Name:  "ignore_illegal",
-							Usage: "忽略上传时文件名中的非法字符",
+							Usage: "Ignore illegal characters in upload filename",
 						},
 						cli.StringFlag{
 							Name:  "force_login_username",
-							Usage: "强制登录指定用户名, 只适用于tieba接口失效的情况",
+							Usage: "Force login with specified username (for tieba API failure only)",
 						},
 						cli.BoolFlag{
 							Name:  "no_check",
-							Usage: "关闭下载文件md5校验",
+							Usage: "Disable MD5 verification after download",
 						},
 						cli.StringFlag{
 							Name:  "upload_policy",
-							Usage: "设置上传遇到同名文件时的策略",
+							Usage: "Policy for duplicate upload names",
 						},
 						cli.StringFlag{
 							Name:  "user_agent",
-							Usage: "浏览器标识",
+							Usage: "User-Agent",
 						},
 						cli.StringFlag{
 							Name:  "pcs_ua",
-							Usage: "PCS 浏览器标识",
+							Usage: "PCS User-Agent",
 						},
 						cli.StringFlag{
 							Name:  "pcs_addr",
-							Usage: "PCS 服务器地址",
+							Usage: "PCS server address",
 						},
 						cli.BoolFlag{
 							Name:  "fix_pcs_addr",
-							Usage: "使用静态PCS 服务器",
+							Usage: "Use static PCS server",
 						},
 						cli.StringFlag{
 							Name:  "pan_ua",
-							Usage: "Pan 浏览器标识",
+							Usage: "Pan User-Agent",
 						},
 						cli.StringFlag{
 							Name:  "proxy",
-							Usage: "设置代理, 支持 http/socks5 代理",
+							Usage: "Set proxy, supports http/socks5",
 						},
 						cli.StringFlag{
 							Name:  "proxy_hostnames",
-							Usage: "设置走代理的域名范围, 多个域名用逗号隔开, 留空则所有域名均代理",
+							Usage: "Set proxied hostnames (comma-separated); empty means all",
 						},
 						cli.StringFlag{
 							Name:  "local_addrs",
-							Usage: "设置本地网卡地址, 多个地址用逗号隔开",
+							Usage: "Set local interface addresses (comma-separated)",
 						},
 					},
 				},
 				{
 					Name:        "reset",
-					Usage:       "恢复默认配置项",
+					Usage:       "Restore default config",
 					UsageText:   app.Name + " config reset",
 					Description: "",
 					Action: func(c *cli.Context) error {
@@ -1983,7 +1706,7 @@ func main() {
 							return err
 						}
 						pcsconfig.Config.PrintTable()
-						fmt.Println("恢复默认配置成功")
+						fmt.Println("Default config restored")
 						return nil
 					},
 				},
@@ -1991,17 +1714,10 @@ func main() {
 		},
 		{
 			Name:      "match",
-			Usage:     "测试通配符",
-			UsageText: app.Name + " match <通配符表达式>",
-			Description: `
-	测试通配符匹配路径, 操作成功则输出所有匹配到的路径.
-
-	示例:
-
-	1. 匹配 /我的资源 目录下所有mp4格式的文件
-	BaiduPCS-Go match /我的资源/*.mp4
-`,
-			Category: "百度网盘",
+			Usage:     "Test wildcard",
+			UsageText: app.Name + " match <wildcard expression>",
+			Description: "See command usage and options for details.",
+			Category: "Baidu Netdisk",
 			Before:   reloadFn,
 			Action: func(c *cli.Context) error {
 				if c.NArg() != 1 {
@@ -2015,7 +1731,7 @@ func main() {
 		},
 		{
 			Name:  "tool",
-			Usage: "工具箱",
+			Usage: "Toolbox",
 			Action: func(c *cli.Context) error {
 				cli.ShowCommandHelp(c, c.Command.Name)
 				return nil
@@ -2023,7 +1739,7 @@ func main() {
 			Subcommands: []cli.Command{
 				{
 					Name:  "showtime",
-					Usage: "显示当前时间(北京时间)",
+					Usage: "Show current time (Beijing time)",
 					Action: func(c *cli.Context) error {
 						fmt.Printf(pcstime.BeijingTimeOption("printLog"))
 						return nil
@@ -2031,9 +1747,9 @@ func main() {
 				},
 				{
 					Name:  "getip",
-					Usage: "获取IP地址",
+					Usage: "Get IP addresses",
 					Action: func(c *cli.Context) error {
-						fmt.Printf("内网IP地址: \n")
+						fmt.Printf("LAN IP addresses: \n")
 						for _, address := range pcsutil.ListAddresses() {
 							fmt.Printf("%s\n", address)
 						}
@@ -2041,17 +1757,17 @@ func main() {
 
 						ipAddr, err := getip.IPInfoFromTechainBaiduByClient(pcsconfig.Config.HTTPClient())
 						if err != nil {
-							fmt.Printf("获取公网IP错误: %s\n", err)
+							fmt.Printf("Failed to get public IP: %s\n", err)
 							return nil
 						}
 
-						fmt.Printf("公网IP地址: %s\n", ipAddr)
+						fmt.Printf("Public IP address: %s\n", ipAddr)
 						return nil
 					},
 				},
 				{
 					Name:        "enc",
-					Usage:       "加密文件",
+					Usage:       "Encrypt file",
 					UsageText:   app.Name + " enc -method=<method> -key=<key> [files...]",
 					Description: cryptoDescription,
 					Action: func(c *cli.Context) error {
@@ -2067,7 +1783,7 @@ func main() {
 								continue
 							}
 
-							fmt.Printf("加密成功, %s -> %s\n", filePath, encryptedFilePath)
+							fmt.Printf("Encryption succeeded, %s -> %s\n", filePath, encryptedFilePath)
 						}
 
 						return nil
@@ -2075,23 +1791,23 @@ func main() {
 					Flags: []cli.Flag{
 						cli.StringFlag{
 							Name:  "method",
-							Usage: "加密方法",
+							Usage: "Encryption method",
 							Value: "aes-128-ctr",
 						},
 						cli.StringFlag{
 							Name:  "key",
-							Usage: "加密密钥",
+							Usage: "Encryption key",
 							Value: app.Name,
 						},
 						cli.BoolFlag{
 							Name:  "disable-gzip",
-							Usage: "不启用GZIP",
+							Usage: "Disable GZIP",
 						},
 					},
 				},
 				{
 					Name:        "dec",
-					Usage:       "解密文件",
+					Usage:       "Decrypt file",
 					UsageText:   app.Name + " dec -method=<method> -key=<key> [files...]",
 					Description: cryptoDescription,
 					Action: func(c *cli.Context) error {
@@ -2107,7 +1823,7 @@ func main() {
 								continue
 							}
 
-							fmt.Printf("解密成功, %s -> %s\n", filePath, decryptedFilePath)
+							fmt.Printf("Decryption succeeded, %s -> %s\n", filePath, decryptedFilePath)
 						}
 
 						return nil
@@ -2115,17 +1831,17 @@ func main() {
 					Flags: []cli.Flag{
 						cli.StringFlag{
 							Name:  "method",
-							Usage: "加密方法",
+							Usage: "Encryption method",
 							Value: "aes-128-ctr",
 						},
 						cli.StringFlag{
 							Name:  "key",
-							Usage: "加密密钥",
+							Usage: "Encryption key",
 							Value: app.Name,
 						},
 						cli.BoolFlag{
 							Name:  "disable-gzip",
-							Usage: "不启用GZIP",
+							Usage: "Disable GZIP",
 						},
 					},
 				},
@@ -2134,10 +1850,10 @@ func main() {
 		{
 			Name:        "clear",
 			Aliases:     []string{"cls"},
-			Usage:       "清空控制台",
+			Usage:       "Clear console",
 			UsageText:   app.Name + " clear",
-			Description: "清空控制台屏幕",
-			Category:    "其他",
+			Description: "Clear console screen",
+			Category:    "Other",
 			Action: func(c *cli.Context) error {
 				pcsliner.ClearScreen()
 				return nil
@@ -2146,7 +1862,7 @@ func main() {
 		{
 			Name:    "quit",
 			Aliases: []string{"exit"},
-			Usage:   "退出程序",
+			Usage:   "Exit program",
 			Action: func(c *cli.Context) error {
 				return cli.NewExitError("", 0)
 			},

@@ -12,7 +12,7 @@ func RunGetQuota() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("用户名: %s, 总空间: %s, 已用空间: %s, 比率: %f%%\n",
+	fmt.Printf("Username: %s, Total: %s, Used: %s, Usage: %f%%\n",
 		GetActiveUser().Name,
 		converter.ConvertFileSize(quota),
 		converter.ConvertFileSize(used),

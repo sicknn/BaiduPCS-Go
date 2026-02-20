@@ -61,7 +61,7 @@ func (pcs *BaiduPCS) CheckIsdir(op string, targetPath string, policy string, fil
 	errInfo := pcserror.NewPCSErrorInfo(op)
 	if isdir {
 		errInfo.ErrType = pcserror.ErrTypeOthers
-		errInfo.Err = errors.New("保存路径不可以覆盖目录")
+		errInfo.Err = errors.New("save path cannot overwrite a directory")
 		return errInfo
 	}
 	// 如果存在文件, 则根据upload策略选择返回的错误码
@@ -70,13 +70,13 @@ func (pcs *BaiduPCS) CheckIsdir(op string, targetPath string, policy string, fil
 		case SkipPolicy:
 			errInfo.ErrCode = 114514
 			errInfo.ErrType = pcserror.ErrTypeRemoteError
-			errInfo.ErrMsg = "目标位置存在同名文件"
+			errInfo.ErrMsg = "a file with the same name exists at target location"
 			return errInfo
 		case RsyncPolicy:
 			if targetFileSize == fileSize {
 				errInfo.ErrCode = 1919810
 				errInfo.ErrType = pcserror.ErrTypeRemoteError
-				errInfo.ErrMsg = "目标位置存在相同文件"
+				errInfo.ErrMsg = "an identical file exists at target location"
 				return errInfo
 			}
 		default:

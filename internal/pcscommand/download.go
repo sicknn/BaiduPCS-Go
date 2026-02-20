@@ -94,7 +94,7 @@ func RunDownload(paths []string, options *DownloadOptions) {
 	}
 
 	fmt.Print("\n")
-	fmt.Printf("[0] 提示: 当前下载最大并发量为: %d, 下载缓存为: %d\n", options.Parallel, cfg.CacheSize)
+	fmt.Printf("[0] Tip: current max download concurrency: %d, download cache size: %d\n", options.Parallel, cfg.CacheSize)
 
 	var (
 		pcs       = GetBaiduPCS()
@@ -173,7 +173,7 @@ func RunDownload(paths []string, options *DownloadOptions) {
 			unit.SavePath = GetActiveUser().GetSavePath(vPath)
 		}
 		info := executor.Append(&unit, options.MaxRetry)
-		fmt.Printf("[%s] 加入下载队列: %s\n", info.Id(), v.Path)
+		fmt.Printf("[%s] Added to download queue: %s\n", info.Id(), v.Path)
 	}
 
 	// 开始计时
@@ -182,12 +182,12 @@ func RunDownload(paths []string, options *DownloadOptions) {
 	// 开始执行
 	executor.Execute()
 
-	fmt.Printf("\n下载结束, 时间: %s, 数据总量: %s\n", statistic.Elapsed()/1e6*1e6, converter.ConvertFileSize(statistic.TotalSize()))
+	fmt.Printf("\nDownload finished, elapsed: %s, total data: %s\n", statistic.Elapsed()/1e6*1e6, converter.ConvertFileSize(statistic.TotalSize()))
 
 	// 输出失败的文件列表
 	failedList := executor.FailedDeque()
 	if failedList.Size() != 0 {
-		fmt.Printf("以下文件下载失败: \n")
+		fmt.Printf("The following files failed to download:\n")
 		tb := pcstable.NewTable(os.Stdout)
 		for e := failedList.Shift(); e != nil; e = failedList.Shift() {
 			item := e.(*taskframework.TaskInfoItem)

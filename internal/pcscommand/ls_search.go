@@ -43,7 +43,7 @@ func RunLs(pcspath string, lsOptions *LsOptions, orderOptions *baidupcs.OrderOpt
 		return
 	}
 
-	fmt.Printf("\n当前目录: %s\n----\n", pcspath)
+	fmt.Printf("\nCurrent directory: %s\n----\n", pcspath)
 
 	if lsOptions == nil {
 		lsOptions = &LsOptions{}
@@ -84,13 +84,13 @@ func renderTable(op int, isTotal bool, path string, files baidupcs.FileDirectory
 
 	switch op {
 	case opLs:
-		showPath = "文件(目录)"
+		showPath = "File (Directory)"
 	case opSearch:
-		showPath = "路径"
+		showPath = "Path"
 	}
 
 	if isTotal {
-		tb.SetHeader([]string{"#", "fs_id", "app_id", "文件大小", "创建日期", "修改日期", "md5(截图请打码)", showPath})
+		tb.SetHeader([]string{"#", "fs_id", "app_id", "Size", "Created", "Modified", "md5 (mask before sharing screenshots)", showPath})
 		tb.SetColumnAlignment([]int{tablewriter.ALIGN_DEFAULT, tablewriter.ALIGN_RIGHT, tablewriter.ALIGN_RIGHT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT})
 		for k, file := range files {
 			if file.Isdir {
@@ -100,7 +100,7 @@ func renderTable(op int, isTotal bool, path string, files baidupcs.FileDirectory
 
 			var md5 string
 			if len(file.BlockList) > 1 {
-				md5 = "(可能不正确)" + file.MD5
+				md5 = "(possibly inaccurate) " + file.MD5
 			} else {
 				md5 = file.MD5
 			}
@@ -113,9 +113,9 @@ func renderTable(op int, isTotal bool, path string, files baidupcs.FileDirectory
 			}
 		}
 		fN, dN = files.Count()
-		tb.Append([]string{"", "", "总: " + converter.ConvertFileSize(files.TotalSize(), 2), "", "", "", fmt.Sprintf("文件总数: %d, 目录总数: %d", fN, dN)})
+		tb.Append([]string{"", "", "Total: " + converter.ConvertFileSize(files.TotalSize(), 2), "", "", "", fmt.Sprintf("Files: %d, Directories: %d", fN, dN)})
 	} else {
-		tb.SetHeader([]string{"#", "文件大小", "修改日期", showPath})
+		tb.SetHeader([]string{"#", "Size", "Modified", showPath})
 		tb.SetColumnAlignment([]int{tablewriter.ALIGN_DEFAULT, tablewriter.ALIGN_RIGHT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT})
 		for k, file := range files {
 			if file.Isdir {
@@ -131,13 +131,13 @@ func renderTable(op int, isTotal bool, path string, files baidupcs.FileDirectory
 			}
 		}
 		fN, dN = files.Count()
-		tb.Append([]string{"", "总: " + converter.ConvertFileSize(files.TotalSize(), 2), "", fmt.Sprintf("文件总数: %d, 目录总数: %d", fN, dN)})
+		tb.Append([]string{"", "Total: " + converter.ConvertFileSize(files.TotalSize(), 2), "", fmt.Sprintf("Files: %d, Directories: %d", fN, dN)})
 	}
 
 	tb.Render()
 
 	if fN+dN >= 50 {
-		fmt.Printf("\n当前目录: %s\n", path)
+		fmt.Printf("\nCurrent directory: %s\n", path)
 	}
 
 	fmt.Printf("----\n")
